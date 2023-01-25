@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Container } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import CarService from '../services/CarService';
 
 // Collect inputs from user, and send post request to create car
 
 function AddCarComponent(props) {
+
+    const navigate = useNavigate();
 
 
     // Car fields, to send to backend post request api
@@ -19,6 +23,27 @@ function AddCarComponent(props) {
     const handleType = (e) => { setType(e.target.value); }
     const handleModelYear = (e) => { setModelYear(e.target.value); }
     const handleDailySek = (e) => { setDailySek(e.target.value); }
+
+    // Create car with field inputs, send as request body in a post request
+    const createCar = (e) => {
+        e.preventDefault();
+
+        // Create object with field inputs, to send as request body
+        // (Car id is automatically assigned in backend)
+        let car = { regNr, model, type, modelYear, dailySek };
+
+        // Send post request wih created object as body
+        CarService.createCar(car).then((response) => {
+            navigate('/allcars', { replace: true }); // Display all cars if success
+        }).catch(error => {
+            console.log(error)
+        });;
+    }
+
+    // Go back to list for all cars, when canceled
+    const goToCarsList = () => {
+        navigate('/allcars', { replace: true });
+    }
 
 
     return (
@@ -60,17 +85,19 @@ function AddCarComponent(props) {
                             </Form.Group>
                             <Form.Group className="mb-2" controlId="formBasicModelYear">
                                 <Form.Label>Model Year</Form.Label>
-                                <Form.Control size="sm" type="text" placeholder="Enter model year"
+                                <Form.Control size="sm" type="number" placeholder="Example: 2021"
+                                    min="1980" max="2099" step="1"
                                     value={modelYear} onChange={handleModelYear} />
                             </Form.Group>
                             <Form.Group className="mb-2" controlId="formBasicDailySek">
                                 <Form.Label>SEK per day</Form.Label>
                                 <Form.Control size="sm" type="number" placeholder="Enter Enter SEK/day"
+                                    min="0" max="2000" step="10"
                                     value={dailySek} onChange={handleDailySek} />
                             </Form.Group>
 
-                            {/* <Button variant="primary" onClick={createCustomer}>Submit</Button>{' '}
-                            <Button variant="warning" onClick={goToListCustomers}>Cancel</Button> */}
+                            <Button variant="primary" onClick={createCar}>Submit</Button>{' '}
+                            <Button variant="warning" onClick={goToCarsList}>Cancel</Button>
 
                             {/* <Button type="submit">Submit form</Button> */}
 
