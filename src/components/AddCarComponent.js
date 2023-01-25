@@ -14,11 +14,11 @@ function AddCarComponent(props) {
     const [dailySek, setDailySek] = useState("")
 
     // Functions for handling inputs, i.e. update car fields with useStates
-    const handleRegNr = (e) => { setRegNr(e.target.value); } 
-    const handleModel = (e) => { setModel(e.target.value); } 
-    const handleType = (e) => { setType(e.target.value); } 
-    const handleModelYear = (e) => { setModelYear(e.target.value); } 
-    const handleDailySek = (e) => { setDailySek(e.target.value); } 
+    const handleRegNr = (e) => { setRegNr(e.target.value); }
+    const handleModel = (e) => { setModel(e.target.value); }
+    const handleType = (e) => { setType(e.target.value); }
+    const handleModelYear = (e) => { setModelYear(e.target.value); }
+    const handleDailySek = (e) => { setDailySek(e.target.value); }
 
 
     return (
@@ -29,44 +29,48 @@ function AddCarComponent(props) {
                     <Card.Body>
                         <Card.Title style={{ fontSize: 24 }} > Customer details</Card.Title>
                         <Card.Text>
-                            Please enter customer details and press submit when done
+                            Please enter car details and press submit when done
                         </Card.Text>
 
                         {/* Use react-bootstrap forms component inside a cards component */}
                         <Form style={{ fontSize: 14, fontWeight: 500 }}>
-                            <Form.Group className="mb-2" controlId="formBasicFirstName">
-                                <Form.Label>First Name</Form.Label>
-                                <Form.Control size="sm" type="text" placeholder="Enter first name"
-                                    value={fName} onChange={handleFName} />
+                            <Form.Group className="mb-2" controlId="formBasicRegNr">
+                                <Form.Label>Registration Number</Form.Label>
+                                <Form.Control size="sm" type="text" placeholder="Enter reg.nr "
+                                    value={regNr} onChange={handleRegNr} />
                             </Form.Group>
-                            <Form.Group className="mb-2" controlId="formBasicLastName">
-                                <Form.Label>Last Name</Form.Label>
-                                <Form.Control size="sm" type="text" placeholder="Enter last name"
-                                    value={lName} onChange={handleLName} />
+                            <Form.Group className="mb-2" controlId="formBasicModel">
+                                <Form.Label>Model/Brand</Form.Label>
+                                <Form.Control size="sm" type="text" placeholder="Enter model"
+                                    value={model} onChange={handleModel} />
                             </Form.Group>
-                            <Form.Group className="mb-2" controlId="formBasicDateOfBirth">
-                                <Form.Label>Date of Birth</Form.Label>
-                                <Form.Control size="sm" type="date" placeholder="Enter date of birth"
-                                    value={dateOfBirth} onChange={handleDateOfBirth} />
+                            {/* Select - options for car type (enum at backend)*/}
+                            <Form.Group className="mb-2" controlId="formBasicType">
+                                <Form.Label>Type</Form.Label>
+                                <Form.Select aria-label="Default select example"
+                                    value={type} onChange={handleType}>
+                                    <option>Select car Type</option>
+                                    <option value="MINI">Mini</option>
+                                    <option value="SEDAN">Sedan</option>
+                                    <option value="SPORT">Sport</option>
+                                    <option value="CAB">Cab</option>
+                                    <option value="SUV">Suv</option>
+                                    <option value="BUS">Bus</option>
+                                </Form.Select>
                             </Form.Group>
-                            <Form.Group className="mb-2" controlId="formBasicSsn">
-                                <Form.Label>SSN </Form.Label>
-                                <Form.Control size="sm" type="text" placeholder="Enter social security number"
-                                    value={ssn} onChange={handleSsn} />
+                            <Form.Group className="mb-2" controlId="formBasicModelYear">
+                                <Form.Label>Model Year</Form.Label>
+                                <Form.Control size="sm" type="text" placeholder="Enter model year"
+                                    value={modelYear} onChange={handleModelYear} />
                             </Form.Group>
-                            <Form.Group className="mb-2" controlId="formBasicAddress">
-                                <Form.Label>Address</Form.Label>
-                                <Form.Control size="sm" type="text" placeholder="Enter address"
-                                    value={address} onChange={handleAddress} />
-                            </Form.Group>
-                            <Form.Group className="mb-2" controlId="formBasicEmail">
-                                <Form.Label>Email address</Form.Label>
-                                <Form.Control size="sm" type="email" placeholder="Enter email"
-                                    value={email} onChange={handleEmail} />
+                            <Form.Group className="mb-2" controlId="formBasicDailySek">
+                                <Form.Label>SEK per day</Form.Label>
+                                <Form.Control size="sm" type="number" placeholder="Enter Enter SEK/day"
+                                    value={dailySek} onChange={handleDailySek} />
                             </Form.Group>
 
-                            <Button variant="primary" onClick={createCustomer}>Submit</Button>{' '}
-                            <Button variant="warning" onClick={goToListCustomers}>Cancel</Button>
+                            {/* <Button variant="primary" onClick={createCustomer}>Submit</Button>{' '}
+                            <Button variant="warning" onClick={goToListCustomers}>Cancel</Button> */}
 
                             {/* <Button type="submit">Submit form</Button> */}
 
