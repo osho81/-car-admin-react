@@ -48,7 +48,7 @@ function AddCarComponent(props) {
 
     return (
         <div>
-            <Container style={{ marginLeft: '12,5%', marginBottom: '5%', width: '75%', justifyContent: 'center' }}>
+            <Container style={{ marginTop: '3%', marginLeft: '12,5%', marginBottom: '5%', width: '75%', justifyContent: 'center' }}>
                 {/* Card has 75% width of the container's 75% screen width */}
                 <Card style={{ marginLeft: '20%', width: '60%' }}>
                     <Card.Body>
@@ -96,10 +96,10 @@ function AddCarComponent(props) {
                                     value={dailySek} onChange={handleDailySek} />
                             </Form.Group>
 
-                            <Button variant="primary" onClick={createCar}>Submit</Button>{' '}
-                            <Button variant="warning" onClick={goToCarsList}>Cancel</Button>
-
-                            {/* <Button type="submit">Submit form</Button> */}
+                            <div className="add-car-btns">
+                                <Button variant="warning" onClick={goToCarsList}>Cancel</Button>{' '}
+                                <Button variant="primary" onClick={createCar}>Submit</Button>
+                            </div>
 
                         </Form>
                     </Card.Body>

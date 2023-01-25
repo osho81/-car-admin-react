@@ -78,6 +78,12 @@
   margin: 2%;
 }
 
+.add-car-btns {
+  /* Separate buttons: */
+  display: flex; 
+  justify-content: space-between; 
+}
+
 .footer {
   background-color: rgb(229, 247, 173) !important;
   position: fixed;
