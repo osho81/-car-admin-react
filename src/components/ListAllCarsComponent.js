@@ -46,7 +46,7 @@ function ListAllCarsComponent(props) {
 
     const viewCarDetails = async (e) => {
         const currentId = await e.target.id;
-        navigate(`/cars/${currentId}`); // Note: backticks
+        navigate(`/car/${currentId}`); // Note: backticks
     }
 
 

@@ -18,7 +18,7 @@ function ViewCarComponent(props) {
 
     useEffect(() => { // Get customer with aquired
 
-        async function getCars() {
+        async function getCar() {
             CarService.getAllCars().then((response) => {
                 response.data.map((c) => {
                     if (c.id === Number(id)) { // Find specific car
@@ -29,14 +29,14 @@ function ViewCarComponent(props) {
                 console.log(error);
             })
         }
-        getCars();
+        getCar();
 
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
 
-    //   const editCar = () => {
-    //     navigate(`/update-customer/${id}`);
-    //   }
+    const editCar = () => {
+        navigate(`/update-car-view/${id}`);
+    }
 
     const backToListCars = () => {
         navigate('/allcars', { replace: true });
@@ -83,12 +83,14 @@ function ViewCarComponent(props) {
                     </tbody>
                 </Table>
                 <Card.Body>
-                    {/* <Button variant="primary" onClick={editCustomer}>Edit</Button>{' '} */}
+                    <div className="separate-btns-row">
+                        <Button className="neutral-btn broad-btn" variant="warning" onClick={backToListCars}>
+                            <span className="not-clickable-part"><FontAwesomeIcon icon={faArrowLeft} />
+                            </span>
+                        </Button>{" "}
 
-                    <Button className="neutral-btn broad-btn" variant="warning" onClick={backToListCars}>
-                        <span className="not-clickable-part"><FontAwesomeIcon icon={faArrowLeft} />
-                        </span>
-                    </Button>
+                        <Button variant="primary" onClick={editCar}>Edit</Button>
+                    </div>
                 </Card.Body>
             </Card>
         </Container >
