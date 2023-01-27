@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Alert, Table, Button } from 'react-bootstrap';
 import CarService from '../services/CarService'; // Import class with car functions
 import { useNavigate } from 'react-router-dom';
+
+
+// import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Fontawsome for react; combine into an element before usage
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,6 +14,13 @@ import { faInfo } from "@fortawesome/free-solid-svg-icons";
 function ListAllCarsComponent(props) {
 
     const navigate = useNavigate();
+
+    // For the confirmation/dialog box
+    const [show, setShow] = useState(false);
+
+    // Boolean for confirmation of deleting car
+    const [confirmed, setConfirmed] = useState(false);
+    const [carToDelete, setCarToDelete] = useState("");
 
     const [isLoading, setisLoading] = useState(false) // Control rendering; optional
 
@@ -35,13 +46,19 @@ function ListAllCarsComponent(props) {
 
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const deleteCar = (car) => {
-        // Delete, with selected car body
-        CarService.deleteCar(car).then(res => {
-            console.log(car + " deleted");
+    const deleteCar = () => {
+
+        console.log("i am in here now");
+        // // Delete, with selected car body
+        CarService.deleteCar(carToDelete).then(res => {
+            console.log("Deleted");
         });
-        // Also keep all cars except (the deleted) car with this id
-        setAllCars(allCars.filter(c => c.id !== car.id));
+
+        // // Also keep all cars except (the deleted) car with this id
+        setAllCars(allCars.filter(c => c.id !== carToDelete.id));
+
+        // Change to not display confirmation box
+        setShow(false);
     }
 
     const viewCarDetails = async (e) => {
@@ -52,6 +69,26 @@ function ListAllCarsComponent(props) {
 
     return (
         <div style={{ marginBottom: '5%' }}>
+
+            {/* Div for alert/popup-confirmation box:  */}
+            <div style={{ position: "fixed", marginLeft: "25%" }}>
+                <Alert show={show} variant="danger">
+                    <Alert.Heading>WARNING!</Alert.Heading>
+                    <p>You are about to delete the car; please confirm or cancel:</p>
+                    <hr />
+                    <div className="d-flex justify-content-end">
+                        <Button className="neutral-btn" onClick={() => setShow(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="delete-btn" variant="danger" onClick={() => deleteCar()}>
+                            Confirm
+                        </Button>
+                    </div>
+                </Alert>
+
+                {/* {!show && <Button onClick={() => setShow(true)}>Show Alert</Button>} */}
+            </div>
+
             <h2 className='list-header'>All Cars</h2>
             <Table striped bordered hover>
                 <thead>
@@ -84,8 +121,10 @@ function ListAllCarsComponent(props) {
                                     </Button>
                                     {" "}
 
-                                    {/* Alternatively assign car.id as id for this row, find car and send to delete request: */}
-                                    <Button className="delete-btn" variant="danger" onClick={() => deleteCar(car)}>Delete</Button>
+                                    {/* <Button className="delete-btn" variant="danger" onClick={() => deleteCar(car)}>Delete</Button> */}
+                                    {/* (Alternatively assign car.id as id for this row, find car and send to delete request) */}
+
+                                    <Button className="delete-btn" variant="danger" onClick={() => { setShow(true); setCarToDelete(car); }}>Delete</Button>
 
                                 </td>
                             </tr>

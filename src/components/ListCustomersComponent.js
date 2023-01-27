@@ -49,12 +49,12 @@ function ListAllCarsComponent(props) {
                     <tr>
                         <th>#</th>
                         <th>SSN</th>
-                        <th>Date of Birth</th>
+                        {/* <th>Date of Birth</th> */}
                         <th>Email</th>
-                        <th>First Name</th>
+                        {/* <th>First Name</th> */}
                         <th>Last Name</th>
-                        <th>Address</th>
-                        <th>Orders</th>
+                        {/* <th>Address</th> */}
+                        <th>Number of orders</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -65,11 +65,11 @@ function ListAllCarsComponent(props) {
                             <tr key={index}>
                                 <td> {customer.id} </td>
                                 <td> {customer.ssn} </td>
-                                <td> {customer.dateOfBirth} </td>
+                                {/* <td> {customer.dateOfBirth} </td> */}
                                 <td> {customer.email} </td>
-                                <td> {customer.fName} </td>
+                                {/* <td> {customer.fName} </td> */}
                                 <td> {customer.lName} </td>
-                                <td> {customer.address} </td>
+                                {/* <td> {customer.address} </td> */}
 
                                 <td>
                                     {customer.ordersByCustomer.length}
