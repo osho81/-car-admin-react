@@ -6,10 +6,14 @@ class CarService {
         return axios.get("http://localhost:9090/api/v1/cars");
     }
 
-    createCar(car) { // Class function
+    createCar(car) { 
         return axios.post("http://localhost:9090/api/v1/addcar", car);
     }
 
+    deleteCar(car) { 
+        // Note: data payload is different for request body in delete methods
+        return axios.delete("http://localhost:9090/api/v1/deletecar", { data: car });
+    }
 
 }
 

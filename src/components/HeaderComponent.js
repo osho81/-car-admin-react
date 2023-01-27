@@ -23,7 +23,6 @@ function HeaderComponent(props) {
                                 {/* <NavDropdown.Item href="/allcars">All Cars</NavDropdown.Item> */}
                                 <NavLink className="nav-item" to="/allcars">All Cars</NavLink>
 
-
                                 <NavDropdown.Divider />
                                 {/* <NavDropdown.Item href="/minicars">Mini</NavDropdown.Item> */}
                                 <NavLink className="nav-item" to="/minicars">Mini</NavLink><br></br>

@@ -78,10 +78,40 @@
   margin: 2%;
 }
 
-.add-car-btns {
+.separate-btns-row {
   /* Separate buttons: */
-  display: flex; 
-  justify-content: space-between; 
+  display: flex;
+  justify-content: space-between;
+}
+
+.neutral-btn {
+  padding: 0 10% !important;
+  color: black !important;
+  background-color: rgb(229, 247, 173) !important;
+  border-color: black !important;
+  border-width: 2px !important;
+}
+
+.info-btn {
+  padding: 0 10% !important;
+}
+
+.broad-btn {
+  padding: 1% 5% !important;
+}
+
+.delete-btn {
+  margin-left: 15%;
+  padding: 0 2% !important;
+  color: black !important;
+  background-color: red;
+  border-color: black !important;
+  border-width: 2px !important;
+}
+
+.not-clickable-part {
+  cursor: default;
+  pointer-events: none;
 }
 
 .footer {

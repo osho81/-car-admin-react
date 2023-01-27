@@ -96,7 +96,7 @@ function AddCarComponent(props) {
                                     value={dailySek} onChange={handleDailySek} />
                             </Form.Group>
 
-                            <div className="add-car-btns">
+                            <div className="separate-btns-row">
                                 <Button variant="warning" onClick={goToCarsList}>Cancel</Button>{' '}
                                 <Button variant="primary" onClick={createCar}>Submit</Button>
                             </div>

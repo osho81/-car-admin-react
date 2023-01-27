@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button } from 'react-bootstrap';
 import CarService from '../services/CarService'; // Import class with car functions
+import { useNavigate } from 'react-router-dom';
+
+// Fontawsome for react; combine into an element before usage
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfo } from "@fortawesome/free-solid-svg-icons";
 
 function ListAllCarsComponent(props) {
+
+    const navigate = useNavigate();
 
     const [isLoading, setisLoading] = useState(false) // Control rendering; optional
 
@@ -28,6 +35,20 @@ function ListAllCarsComponent(props) {
 
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+    const deleteCar = (car) => {
+        // Delete, with selected car body
+        CarService.deleteCar(car).then(res => {
+            console.log(car + " deleted");
+        });
+        // Also keep all cars except (the deleted) car with this id
+        setAllCars(allCars.filter(c => c.id !== car.id));
+    }
+
+    const viewCarDetails = async (e) => {
+        const currentId = await e.target.id;
+        navigate(`/cars/${currentId}`); // Note: backticks
+    }
+
 
     return (
         <div style={{ marginBottom: '5%' }}>
@@ -41,6 +62,7 @@ function ListAllCarsComponent(props) {
                         <th>Model</th>
                         <th>Model Year</th>
                         <th>SEK/day</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 
@@ -56,8 +78,14 @@ function ListAllCarsComponent(props) {
                                 <td> {car.dailySek}</td>
                                 <td>
 
-                                    {/* <Button variant="primary" onClick={() => viewTrAccountDetails(trAccount.id)}>Select</Button>{" "}
-                                <Button variant="danger" onClick={() => deleteTrAccount(trAccount.id)}>Delete</Button> */}
+                                    <Button className="neutral-btn info-btn" id={car.id} variant="primary" onClick={viewCarDetails}>
+                                        <span className="not-clickable-part"><FontAwesomeIcon icon={faInfo} />
+                                        </span>
+                                    </Button>
+                                    {" "}
+
+                                    {/* Alternatively assign car.id as id for this row, find car and send to delete request: */}
+                                    <Button className="delete-btn" variant="danger" onClick={() => deleteCar(car)}>Delete</Button>
 
                                 </td>
                             </tr>

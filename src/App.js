@@ -7,6 +7,9 @@ import FooterComponent from './components/FooterComponent';
 import ListAllCarsComponent from './components/ListAllCarsComponent';
 import ListCarsByTypeComponent from './components/ListCarsByTypeComponent';
 import AddCarComponent from './components/AddCarComponent';
+import ListCustomersComponent from  './components/ListCustomersComponent';
+import ViewCustomerComponent from './components/ViewCustomerComponent';
+import ViewCarComponent from './components/ViewCarComponent';
 
 // Arrange routing hierarchy and structure
 function App() {
@@ -42,6 +45,10 @@ function App() {
             <Route path="/buscars" element={<ListCarsByTypeComponent type="bus" />}></Route>
 
             <Route path="/addcar" element={<AddCarComponent />}></Route>
+            <Route path="/customers" element={<ListCustomersComponent />}></Route>
+
+            <Route path="/customer/:id" element={<ViewCustomerComponent />}></Route>
+            <Route path="/cars/:id" element={<ViewCarComponent />}></Route>
 
           </Routes>
         </div>

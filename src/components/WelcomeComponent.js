@@ -8,7 +8,6 @@ function WelcomeComponent(props) {
             <br></br>
             {/* Links styled as a buttons: */}
             <Link to="/customers" className="btn btn-primary">All Customers</Link>{" "}
-            <Link to="/tr-accounts" className="btn btn-primary">All Accounts</Link>{" "}
             <Link to="/allcars" className="btn btn-primary">List All Cars</Link>
         </div>
     );
