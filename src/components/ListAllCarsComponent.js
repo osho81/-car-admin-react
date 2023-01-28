@@ -62,53 +62,90 @@ function ListAllCarsComponent(props) {
     }
 
     const sortTable = async (e) => {
-        const currentId = await e.target.id;
-        console.log(currentId);
+        // Get id from clicked sort span-btn i tablehead
+        const currentId = await e.target.id; 
 
         switch (currentId) {
-            case "id":
-                if (Number(allCars[0].id) > Number(allCars[1].id)) { // id's can't be equal
+            case "id": // id's can't be equal - unique
+                if (Number(allCars[0].id) > Number(allCars[1].id)) {
                     setAllCars(allCars.sort(function (a, b) { return a.id - b.id }));
                 } else {
                     setAllCars(allCars.sort(function (a, b) { return b.id - a.id }));
                 }
                 break;
-            case "regNr":
-                if (allCars[0].regNr >= allCars[1].regNr) {
-                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+
+            case "regNr": // Alphabetical: check if sorted, then sort or reverse
+                let sorted1;
+
+                // Check if array is already sorted
+                for (let i = 0; i < allCars.length - 1; i++) {
+                    if (allCars[i].regNr.localeCompare(allCars[i + 1].regNr) == 1) {
+                        sorted1 = false;
+                        break;
+                    } else {
+                        sorted1 = true; // Needed in JS, otherwise risk undefined
+                    }
+                }
+
+                if (sorted1) { // if sorted >> reverse array
+                    setAllCars(allCars.sort((a, b) => b.regNr.localeCompare(a.regNr)));
+                } else { // Else if unsorted >> sort it
+                    setAllCars(allCars.sort((a, b) => a.regNr.localeCompare(b.regNr)));
+                }
+                break;
+
+            case "model": // Same as regNr
+                let sorted2;
+                for (let i = 0; i < allCars.length - 1; i++) {
+                    if (allCars[i].model.localeCompare(allCars[i + 1].model) == 1) {
+                        sorted2 = false;
+                        break;
+                    } else {
+                        sorted2 = true;
+                    }
+                }
+                if (sorted2) {
+                    setAllCars(allCars.sort((a, b) => b.model.localeCompare(a.model)));
                 } else {
+                    setAllCars(allCars.sort((a, b) => a.model.localeCompare(b.model)));
+                }
+                break;
+
+            // No sorting by car type, since we can filter by car type
+
+            case "modelYear": // Same as regNr, but numerical in this case
+                let sorted3;
+                for (let i = 0; i < allCars.length - 1; i++) {
+                    if (allCars[i].modelYear > allCars[i + 1].modelYear) {
+                        sorted3 = false; // If any is bigger than previous, means unsorted
+                        break;
+                    } else {
+                        sorted3 = true;
+                    }
+                }
+
+                if (sorted3) {
                     setAllCars(allCars.sort(function (a, b) { return b.modelYear - a.modelYear }));
-                }
-                break;
-            case "model":
-                if (Number(allCars[0].modelYear) > Number(allCars[1].modelYear) ||
-                    Number(allCars[0].modelYear) != Number(allCars[1].modelYear)) {
-                    setAllCars(allCars.sort(function (b, a) { return a.modelYear - b.modelYear }));
                 } else {
                     setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
                 }
                 break;
-            case "type":
-                if (Number(allCars[0].modelYear) > Number(allCars[1].modelYear) ||
-                    Number(allCars[0].modelYear) != Number(allCars[1].modelYear)) {
-                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
-                } else {
-                    setAllCars(allCars.sort(function (a, b) { return b.modelYear - a.modelYear }));
+
+            case "dailySek": // Same as regNr, but numerical in this case
+                let sorted4;
+                for (let i = 0; i < allCars.length - 1; i++) {
+                    if (allCars[i].dailySek > allCars[i + 1].dailySek) {
+                        sorted4 = false; // If any is bigger than previous, means unsorted
+                        break;
+                    } else {
+                        sorted4 = true;
+                    }
                 }
-                break;
-            case "modelYear":
-                if (Number(allCars[0].modelYear) >= Number(allCars[1].modelYear)) {
-                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+
+                if (sorted4) {
+                    setAllCars(allCars.sort(function (a, b) { return b.dailySek - a.dailySek }));
                 } else {
-                    setAllCars(allCars.sort(function (a, b) { return b.modelYear - a.modelYear }));
-                }
-                break;
-            case "dailySek":
-                if (Number(allCars[0].modelYear) > Number(allCars[1].modelYear) ||
-                    Number(allCars[0].modelYear) != Number(allCars[1].modelYear)) {
-                    setAllCars(allCars.sort(function (b, a) { return a.modelYear - b.modelYear }));
-                } else {
-                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                    setAllCars(allCars.sort(function (a, b) { return a.dailySek - b.dailySek  }));
                 }
                 break;
         }
@@ -127,7 +164,7 @@ function ListAllCarsComponent(props) {
                     <Alert.Heading>WARNING!</Alert.Heading>
                     <p>You are about to delete the car; please confirm or cancel:</p>
                     <hr />
-                    <div className="d-flex justify-content-end">
+                    <div className="d-flex justify-content-between">
                         <Button className="neutral-btn" onClick={() => setShow(false)}>
                             Cancel
                         </Button>
@@ -152,7 +189,7 @@ function ListAllCarsComponent(props) {
                         {/* Add span-btns for sorting methods */}
                         <th>#<span id='id' variant="primary" onClick={sortTable}> !!!!! </span></th>
                         <th>Reg. Nr<span id='regNr' variant="primary" onClick={sortTable}> !!!!! </span></th>
-                        <th>Type<span id='type' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th>Type</th>
                         <th>Model<span id='model' variant="primary" onClick={sortTable}> !!!!! </span></th>
                         <th>Model Year<span id='modelYear' variant="primary" onClick={sortTable}> !!!!! </span></th>
                         <th>SEK/day<span id='dailySek' variant="primary" onClick={sortTable}> !!!!! </span></th>
