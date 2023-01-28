@@ -42,12 +42,12 @@ function ListAllCarsComponent(props) {
     }
 
     return (
-        <div style={{ marginBottom: '5%' }}>
+        <div style={{ width: "60%", marginLeft: '20%', marginBottom: '5%' }}>
             <h2 className='list-header'>All Customers</h2>
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>#</th>
+                        {/* <th>#</th> */}
                         <th>SSN</th>
                         {/* <th>Date of Birth</th> */}
                         <th>Email</th>
@@ -63,7 +63,7 @@ function ListAllCarsComponent(props) {
                     {allCustomers.map((customer, index) => {
                         return (
                             <tr key={index}>
-                                <td> {customer.id} </td>
+                                {/* <td> {customer.id} </td> */}
                                 <td> {customer.ssn} </td>
                                 {/* <td> {customer.dateOfBirth} </td> */}
                                 <td> {customer.email} </td>

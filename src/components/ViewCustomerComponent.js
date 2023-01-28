@@ -61,12 +61,12 @@ function ViewCustomerComponent(props) {
                             <td>{customer.id}</td>
                         </tr>
                         <tr>
-                            <td>Date of birth</td>
-                            <td>{customer.dateOfBirth}</td>
-                        </tr>
-                        <tr>
                             <td>Social security number</td>
                             <td>{customer.ssn}</td>
+                        </tr>
+                        <tr>
+                            <td>Date of birth</td>
+                            <td>{customer.dateOfBirth}</td>
                         </tr>
                         <tr>
                             <td>First name</td>

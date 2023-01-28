@@ -3,13 +3,10 @@ import { Alert, Table, Button } from 'react-bootstrap';
 import CarService from '../services/CarService'; // Import class with car functions
 import { useNavigate } from 'react-router-dom';
 
-
-// import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
 // Fontawsome for react; combine into an element before usage
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
+import { all } from 'axios';
 
 function ListAllCarsComponent(props) {
 
@@ -18,8 +15,7 @@ function ListAllCarsComponent(props) {
     // For the confirmation/dialog box
     const [show, setShow] = useState(false);
 
-    // Boolean for confirmation of deleting car
-    const [confirmed, setConfirmed] = useState(false);
+    // Store car to delete, in case user/admin confirms delete
     const [carToDelete, setCarToDelete] = useState("");
 
     const [isLoading, setisLoading] = useState(false) // Control rendering; optional
@@ -48,7 +44,6 @@ function ListAllCarsComponent(props) {
 
     const deleteCar = () => {
 
-        console.log("i am in here now");
         // // Delete, with selected car body
         CarService.deleteCar(carToDelete).then(res => {
             console.log("Deleted");
@@ -64,6 +59,62 @@ function ListAllCarsComponent(props) {
     const viewCarDetails = async (e) => {
         const currentId = await e.target.id;
         navigate(`/car/${currentId}`); // Note: backticks
+    }
+
+    const sortTable = async (e) => {
+        const currentId = await e.target.id;
+        console.log(currentId);
+
+        switch (currentId) {
+            case "id":
+                if (Number(allCars[0].id) > Number(allCars[1].id)) { // id's can't be equal
+                    setAllCars(allCars.sort(function (a, b) { return a.id - b.id }));
+                } else {
+                    setAllCars(allCars.sort(function (a, b) { return b.id - a.id }));
+                }
+                break;
+            case "regNr":
+                if (allCars[0].regNr >= allCars[1].regNr) {
+                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                } else {
+                    setAllCars(allCars.sort(function (a, b) { return b.modelYear - a.modelYear }));
+                }
+                break;
+            case "model":
+                if (Number(allCars[0].modelYear) > Number(allCars[1].modelYear) ||
+                    Number(allCars[0].modelYear) != Number(allCars[1].modelYear)) {
+                    setAllCars(allCars.sort(function (b, a) { return a.modelYear - b.modelYear }));
+                } else {
+                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                }
+                break;
+            case "type":
+                if (Number(allCars[0].modelYear) > Number(allCars[1].modelYear) ||
+                    Number(allCars[0].modelYear) != Number(allCars[1].modelYear)) {
+                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                } else {
+                    setAllCars(allCars.sort(function (a, b) { return b.modelYear - a.modelYear }));
+                }
+                break;
+            case "modelYear":
+                if (Number(allCars[0].modelYear) >= Number(allCars[1].modelYear)) {
+                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                } else {
+                    setAllCars(allCars.sort(function (a, b) { return b.modelYear - a.modelYear }));
+                }
+                break;
+            case "dailySek":
+                if (Number(allCars[0].modelYear) > Number(allCars[1].modelYear) ||
+                    Number(allCars[0].modelYear) != Number(allCars[1].modelYear)) {
+                    setAllCars(allCars.sort(function (b, a) { return a.modelYear - b.modelYear }));
+                } else {
+                    setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                }
+                break;
+        }
+
+
+        navigate('/allcars', { replace: true });
     }
 
 
@@ -89,24 +140,30 @@ function ListAllCarsComponent(props) {
                 {/* {!show && <Button onClick={() => setShow(true)}>Show Alert</Button>} */}
             </div>
 
+            {/* Test for sorting actions */}
+            {/* <div className="text-center">
+                <Button id='modelYear' variant="primary" onClick={sortTable}>Sort</Button>{" "}
+            </div> */}
+
             <h2 className='list-header'>All Cars</h2>
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Reg. Nr</th>
-                        <th>Type</th>
-                        <th>Model</th>
-                        <th>Model Year</th>
-                        <th>SEK/day</th>
+                        {/* Add span-btns for sorting methods */}
+                        <th>#<span id='id' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th>Reg. Nr<span id='regNr' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th>Type<span id='type' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th>Model<span id='model' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th>Model Year<span id='modelYear' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th>SEK/day<span id='dailySek' variant="primary" onClick={sortTable}> !!!!! </span></th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody style={{ fontWeight: 500 }}>
-                    {allCars.map((car, index) => {
+                    {allCars.map((car) => {
                         return (
-                            <tr key={index}>
+                            <tr key={car.id}>
                                 <td> {car.id} </td>
                                 <td> {car.regNr} </td>
                                 <td> {car.type}</td>
@@ -135,8 +192,8 @@ function ListAllCarsComponent(props) {
             </Table>
             <br></br>
             <div className="text-center">
-                {/* <Button variant="primary" onClick={addTrAccount}>New Account</Button>{" "}
-                <Button variant="warning" onClick={goBack}>Back</Button> */}
+                {/* <Button variant="primary" onClick={addTrAccount}>New Account</Button>{" "} */}
+                {/* <Button variant="warning" onClick={goBack}>Back</Button> */}
             </div>
         </div>
     );
