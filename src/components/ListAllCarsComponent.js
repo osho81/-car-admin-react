@@ -5,12 +5,18 @@ import { useNavigate } from 'react-router-dom';
 
 // Fontawsome for react; combine into an element before usage
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfo } from "@fortawesome/free-solid-svg-icons";
-import { all } from 'axios';
+import { faInfo, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
 
 function ListAllCarsComponent(props) {
 
     const navigate = useNavigate();
+
+    // Arrow directions for sorting icon 
+    const [idArrow, setIdArrow] = useState(faSortDown); // Sorting-arrow starts down
+    const [regNrArrow, setRegNrArrow] = useState(faSortDown);
+    const [modelArrow, setModelArrow] = useState(faSortDown);
+    const [modelYearArrow, setModelYearArrow] = useState(faSortDown);
+    const [dailySekArrow, setDailySekArrow] = useState(faSortDown);
 
     // For the confirmation/dialog box
     const [show, setShow] = useState(false);
@@ -63,14 +69,16 @@ function ListAllCarsComponent(props) {
 
     const sortTable = async (e) => {
         // Get id from clicked sort span-btn i tablehead
-        const currentId = await e.target.id; 
+        const currentId = await e.target.id;
 
         switch (currentId) {
             case "id": // id's can't be equal - unique
                 if (Number(allCars[0].id) > Number(allCars[1].id)) {
                     setAllCars(allCars.sort(function (a, b) { return a.id - b.id }));
+                    setIdArrow(faSortDown);
                 } else {
                     setAllCars(allCars.sort(function (a, b) { return b.id - a.id }));
+                    setIdArrow(faSortUp);
                 }
                 break;
 
@@ -89,8 +97,10 @@ function ListAllCarsComponent(props) {
 
                 if (sorted1) { // if sorted >> reverse array
                     setAllCars(allCars.sort((a, b) => b.regNr.localeCompare(a.regNr)));
+                    setRegNrArrow(faSortUp);
                 } else { // Else if unsorted >> sort it
                     setAllCars(allCars.sort((a, b) => a.regNr.localeCompare(b.regNr)));
+                    setRegNrArrow(faSortDown);
                 }
                 break;
 
@@ -106,8 +116,10 @@ function ListAllCarsComponent(props) {
                 }
                 if (sorted2) {
                     setAllCars(allCars.sort((a, b) => b.model.localeCompare(a.model)));
+                    setModelArrow(faSortUp);
                 } else {
                     setAllCars(allCars.sort((a, b) => a.model.localeCompare(b.model)));
+                    setModelArrow(faSortDown);
                 }
                 break;
 
@@ -126,8 +138,10 @@ function ListAllCarsComponent(props) {
 
                 if (sorted3) {
                     setAllCars(allCars.sort(function (a, b) { return b.modelYear - a.modelYear }));
+                    setModelYearArrow(faSortUp);
                 } else {
                     setAllCars(allCars.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                    setModelYearArrow(faSortDown);
                 }
                 break;
 
@@ -144,12 +158,13 @@ function ListAllCarsComponent(props) {
 
                 if (sorted4) {
                     setAllCars(allCars.sort(function (a, b) { return b.dailySek - a.dailySek }));
+                    setDailySekArrow(faSortUp);
                 } else {
-                    setAllCars(allCars.sort(function (a, b) { return a.dailySek - b.dailySek  }));
+                    setAllCars(allCars.sort(function (a, b) { return a.dailySek - b.dailySek }));
+                    setDailySekArrow(faSortDown);
                 }
                 break;
         }
-
 
         navigate('/allcars', { replace: true });
     }
@@ -177,22 +192,32 @@ function ListAllCarsComponent(props) {
                 {/* {!show && <Button onClick={() => setShow(true)}>Show Alert</Button>} */}
             </div>
 
-            {/* Test for sorting actions */}
-            {/* <div className="text-center">
-                <Button id='modelYear' variant="primary" onClick={sortTable}>Sort</Button>{" "}
-            </div> */}
-
             <h2 className='list-header'>All Cars</h2>
             <Table striped bordered hover>
                 <thead>
                     <tr>
                         {/* Add span-btns for sorting methods */}
-                        <th>#<span id='id' variant="primary" onClick={sortTable}> !!!!! </span></th>
-                        <th>Reg. Nr<span id='regNr' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th><span id='id' variant="primary" onClick={sortTable}>
+                            # <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={idArrow} />
+                            </span></span></th>
+                        <th><span id='regNr' variant="primary" onClick={sortTable}>
+                            Reg. Nr <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={regNrArrow} />
+                            </span></span></th>
                         <th>Type</th>
-                        <th>Model<span id='model' variant="primary" onClick={sortTable}> !!!!! </span></th>
-                        <th>Model Year<span id='modelYear' variant="primary" onClick={sortTable}> !!!!! </span></th>
-                        <th>SEK/day<span id='dailySek' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th><span id='model' variant="primary" onClick={sortTable}>
+                            Model <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={modelArrow} />
+                            </span></span></th>
+                        <th><span id='modelYear' variant="primary" onClick={sortTable}>
+                            Model Year<span className="not-clickable-part">
+                                <FontAwesomeIcon icon={modelYearArrow} />
+                            </span></span></th>
+                        <th><span id='dailySek' variant="primary" onClick={sortTable}>
+                            SEK/day <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={dailySekArrow} />
+                            </span></span></th>
                         <th>Actions</th>
                     </tr>
                 </thead>

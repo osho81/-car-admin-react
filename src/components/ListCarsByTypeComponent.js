@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Alert, Table, Button } from 'react-bootstrap';
 import CarService from '../services/CarService'; // Import class with car functions
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfo, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
+
+// For more comments see ListALlCarsComponent
 
 function ListCarsByTypeComponent(props) {
 
     const navigate = useNavigate();
 
-    const [isLoading, setisLoading] = useState(false) // Control rendering; optional
+    const [idArrow, setIdArrow] = useState(faSortDown);
+    const [regNrArrow, setRegNrArrow] = useState(faSortDown);
+    const [modelArrow, setModelArrow] = useState(faSortDown);
+    const [modelYearArrow, setModelYearArrow] = useState(faSortDown);
+    const [dailySekArrow, setDailySekArrow] = useState(faSortDown);
+
+    const [show, setShow] = useState(false);
+
+    const [carToDelete, setCarToDelete] = useState("");
+
+    const [isLoading, setisLoading] = useState(false)
 
     const [carsByType, setCarsByType] = useState([])
 
@@ -38,41 +52,57 @@ function ListCarsByTypeComponent(props) {
 
     }, [props]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    const deleteCar = () => {
+
+        CarService.deleteCar(carToDelete).then(res => {
+            console.log("Deleted");
+        });
+
+        setCarsByType(carsByType.filter(c => c.id !== carToDelete.id));
+
+        setShow(false);
+    }
+
+    const viewCarDetails = async (e) => {
+        const currentId = await e.target.id;
+        navigate(`/car/${currentId}`); // Note: backticks
+    }
 
     const sortTable = async (e) => {
-        // Get id from clicked sort span-btn i tablehead
         const currentId = await e.target.id;
 
         switch (currentId) {
-            case "id": // id's can't be equal - unique
+            case "id":
                 if (Number(carsByType[0].id) > Number(carsByType[1].id)) {
                     setCarsByType(carsByType.sort(function (a, b) { return a.id - b.id }));
+                    setIdArrow(faSortDown);
                 } else {
                     setCarsByType(carsByType.sort(function (a, b) { return b.id - a.id }));
+                    setIdArrow(faSortUp);
                 }
                 break;
 
-            case "regNr": // Alphabetical: check if sorted, then sort or reverse
+            case "regNr":
                 let sorted1;
-
-                // Check if array is already sorted
                 for (let i = 0; i < carsByType.length - 1; i++) {
                     if (carsByType[i].regNr.localeCompare(carsByType[i + 1].regNr) == 1) {
                         sorted1 = false;
                         break;
                     } else {
-                        sorted1 = true; // Needed in JS, otherwise risk undefined
+                        sorted1 = true;
                     }
                 }
 
-                if (sorted1) { // if sorted >> reverse array
+                if (sorted1) {
                     setCarsByType(carsByType.sort((a, b) => b.regNr.localeCompare(a.regNr)));
-                } else { // Else if unsorted >> sort it
+                    setRegNrArrow(faSortUp);
+                } else {
                     setCarsByType(carsByType.sort((a, b) => a.regNr.localeCompare(b.regNr)));
+                    setRegNrArrow(faSortDown);
                 }
                 break;
 
-            case "model": // Same as regNr
+            case "model":
                 let sorted2;
                 for (let i = 0; i < carsByType.length - 1; i++) {
                     if (carsByType[i].model.localeCompare(carsByType[i + 1].model) == 1) {
@@ -84,18 +114,20 @@ function ListCarsByTypeComponent(props) {
                 }
                 if (sorted2) {
                     setCarsByType(carsByType.sort((a, b) => b.model.localeCompare(a.model)));
+                    setModelArrow(faSortUp);
                 } else {
                     setCarsByType(carsByType.sort((a, b) => a.model.localeCompare(b.model)));
+                    setModelArrow(faSortDown);
                 }
                 break;
 
             // No sorting by car type, since we can filter by car type
 
-            case "modelYear": // Same as regNr, but numerical in this case
+            case "modelYear":
                 let sorted3;
                 for (let i = 0; i < carsByType.length - 1; i++) {
                     if (carsByType[i].modelYear > carsByType[i + 1].modelYear) {
-                        sorted3 = false; // If any is bigger than previous, means unsorted
+                        sorted3 = false;
                         break;
                     } else {
                         sorted3 = true;
@@ -104,16 +136,18 @@ function ListCarsByTypeComponent(props) {
 
                 if (sorted3) {
                     setCarsByType(carsByType.sort(function (a, b) { return b.modelYear - a.modelYear }));
+                    setModelYearArrow(faSortUp);
                 } else {
                     setCarsByType(carsByType.sort(function (a, b) { return a.modelYear - b.modelYear }));
+                    setModelYearArrow(faSortDown);
                 }
                 break;
 
-            case "dailySek": // Same as regNr, but numerical in this case
+            case "dailySek":
                 let sorted4;
                 for (let i = 0; i < carsByType.length - 1; i++) {
                     if (carsByType[i].dailySek > carsByType[i + 1].dailySek) {
-                        sorted4 = false; // If any is bigger than previous, means unsorted
+                        sorted4 = false;
                         break;
                     } else {
                         sorted4 = true;
@@ -122,39 +156,65 @@ function ListCarsByTypeComponent(props) {
 
                 if (sorted4) {
                     setCarsByType(carsByType.sort(function (a, b) { return b.dailySek - a.dailySek }));
+                    setDailySekArrow(faSortUp);
                 } else {
                     setCarsByType(carsByType.sort(function (a, b) { return a.dailySek - b.dailySek }));
+                    setDailySekArrow(faSortDown);
                 }
                 break;
         }
 
         // Redirect to current filtered car type view, e.g. "/minicars"
-        navigate(`/${props.type.toString().toLowerCase()}cars`); 
+        navigate(`/${props.type.toString().toLowerCase()}cars`);
     }
 
 
 
     return (
         <div style={{ marginBottom: '5%' }}>
+
+            <div style={{ position: "fixed", marginLeft: "25%" }}>
+                <Alert show={show} variant="danger">
+                    <Alert.Heading>WARNING!</Alert.Heading>
+                    <p>You are about to delete the car; please confirm or cancel:</p>
+                    <hr />
+                    <div className="d-flex justify-content-between">
+                        <Button className="neutral-btn" onClick={() => setShow(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="delete-btn" variant="danger" onClick={() => deleteCar()}>
+                            Confirm
+                        </Button>
+                    </div>
+                </Alert>
+            </div>
+
             <h2 className='list-header'>Cars</h2>
             <Table striped bordered hover>
                 <thead>
-                    {/* <tr>
-                        <th>#</th>
-                        <th>Reg. Nr</th>
-                        <th>Type</th>
-                        <th>Model</th>
-                        <th>Model Year</th>
-                        <th>SEK/day</th>
-                    </tr> */}
                     <tr>
                         {/* Add span-btns for sorting methods */}
-                        <th>#<span id='id' variant="primary" onClick={sortTable}> !!!!! </span></th>
-                        <th>Reg. Nr<span id='regNr' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th><span id='id' variant="primary" onClick={sortTable}>
+                            # <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={idArrow} />
+                            </span></span></th>
+                        <th><span id='regNr' variant="primary" onClick={sortTable}>
+                            Reg. Nr <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={regNrArrow} />
+                            </span></span></th>
                         <th>Type</th>
-                        <th>Model<span id='model' variant="primary" onClick={sortTable}> !!!!! </span></th>
-                        <th>Model Year<span id='modelYear' variant="primary" onClick={sortTable}> !!!!! </span></th>
-                        <th>SEK/day<span id='dailySek' variant="primary" onClick={sortTable}> !!!!! </span></th>
+                        <th><span id='model' variant="primary" onClick={sortTable}>
+                            Model <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={modelArrow} />
+                            </span></span></th>
+                        <th><span id='modelYear' variant="primary" onClick={sortTable}>
+                            Model Year<span className="not-clickable-part">
+                                <FontAwesomeIcon icon={modelYearArrow} />
+                            </span></span></th>
+                        <th><span id='dailySek' variant="primary" onClick={sortTable}>
+                            SEK/day <span className="not-clickable-part">
+                                <FontAwesomeIcon icon={dailySekArrow} />
+                            </span></span></th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -171,8 +231,16 @@ function ListCarsByTypeComponent(props) {
                                 <td> {car.dailySek}</td>
                                 <td>
 
-                                    {/* <Button variant="primary" onClick={() => viewTrAccountDetails(trAccount.id)}>Select</Button>{" "}
-                                <Button variant="danger" onClick={() => deleteTrAccount(trAccount.id)}>Delete</Button> */}
+                                    <Button className="neutral-btn info-btn" id={car.id} variant="primary" onClick={viewCarDetails}>
+                                        <span className="not-clickable-part"><FontAwesomeIcon icon={faInfo} />
+                                        </span>
+                                    </Button>
+                                    {" "}
+
+                                    {/* <Button className="delete-btn" variant="danger" onClick={() => deleteCar(car)}>Delete</Button> */}
+                                    {/* (Alternatively assign car.id as id for this row, find car and send to delete request) */}
+
+                                    <Button className="delete-btn" variant="danger" onClick={() => { setShow(true); setCarToDelete(car); }}>Delete</Button>
 
                                 </td>
                             </tr>
