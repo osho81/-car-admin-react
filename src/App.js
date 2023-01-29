@@ -36,6 +36,7 @@ function App() {
 
             {/* Car related rendering */}
             <Route path="/allcars" element={<ListAllCarsComponent />}></Route>
+            <Route path="/customers" element={<ListCustomersComponent />}></Route>
 
             {/* Send in props.type or other data from this parent to these children: */}
             <Route path="/minicars" element={<ListCarsByTypeComponent type="mini" />}></Route>
@@ -46,7 +47,6 @@ function App() {
             <Route path="/buscars" element={<ListCarsByTypeComponent type="bus" />}></Route>
 
             <Route path="/addcar" element={<AddCarComponent />}></Route>
-            <Route path="/customers" element={<ListCustomersComponent />}></Route>
 
             <Route path="/customer/:id" element={<ViewCustomerComponent />}></Route>
             <Route path="/car/:id" element={<ViewCarComponent />}></Route>

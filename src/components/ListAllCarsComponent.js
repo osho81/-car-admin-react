@@ -11,7 +11,7 @@ function ListAllCarsComponent(props) {
 
     const navigate = useNavigate();
 
-    // Arrow directions for sorting icon 
+    // Arrow directions for the sorting-icon 
     const [idArrow, setIdArrow] = useState(faSortDown); // Sorting-arrow starts down
     const [regNrArrow, setRegNrArrow] = useState(faSortDown);
     const [modelArrow, setModelArrow] = useState(faSortDown);
