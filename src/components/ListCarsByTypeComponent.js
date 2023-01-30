@@ -30,7 +30,7 @@ function ListCarsByTypeComponent(props) {
         // Get a list of all cars
         const getListCars = () => {
             setisLoading(true);
-            setCarsByType([]);
+            setCarsByType([]);// Empty array on each render
 
             CarService.getAllCars().then((response) => {
 

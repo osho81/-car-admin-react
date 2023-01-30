@@ -53,6 +53,7 @@
 .main-navbar-outer {
   width: 100%;
   background-color: rgb(229, 247, 173) !important;
+  border-bottom: 2px solid;
   font-weight: 700;
 }
 
@@ -123,7 +124,7 @@
   opacity: 0.8;
   width: 100%;
   height: 30px;
-  background-color: white;
+  border-top: 2px solid;
   text-align: center;
   font-size: x-small;
   color: black;

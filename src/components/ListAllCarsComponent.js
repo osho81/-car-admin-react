@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, Table, Button } from 'react-bootstrap';
 import CarService from '../services/CarService'; // Import class with car functions
+import OrderService from '../services/OrderService';
 import { useNavigate } from 'react-router-dom';
 
 // Fontawsome for react; combine into an element before usage
@@ -23,6 +24,12 @@ function ListAllCarsComponent(props) {
 
     // Store car to delete, in case user/admin confirms delete
     const [carToDelete, setCarToDelete] = useState("");
+
+    // Find out if there is substitute car of same type
+    const [carsByType, setCarsByType] = useState([])
+
+    // Find out orders that has booked the car to be deleted
+    const [ordersToHandle, setOrdersToHandle] = useState([]);
 
     const [isLoading, setisLoading] = useState(false) // Control rendering; optional
 
@@ -47,25 +54,6 @@ function ListAllCarsComponent(props) {
         getListCars();
 
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-    const deleteCar = () => {
-
-        // // Delete, with selected car body
-        CarService.deleteCar(carToDelete).then(res => {
-            console.log("Deleted");
-        });
-
-        // // Also keep all cars except (the deleted) car with this id
-        setAllCars(allCars.filter(c => c.id !== carToDelete.id));
-
-        // Change to not display confirmation box
-        setShow(false);
-    }
-
-    const viewCarDetails = async (e) => {
-        const currentId = await e.target.id;
-        navigate(`/car/${currentId}`); // Note: backticks
-    }
 
     const sortTable = async (e) => {
         // Get id from clicked sort span-btn i tablehead
@@ -169,6 +157,82 @@ function ListAllCarsComponent(props) {
         navigate('/allcars', { replace: true });
     }
 
+    const prepareDelete = (car) => {
+        // console.log(car);
+        setCarToDelete(car);
+
+        setOrdersToHandle([]); // Empty array before each delete-preparation
+
+        OrderService.getAllOrders().then((response) => {
+
+            response.data.map((order) => {
+                let today = new Date(); // To filter out old orders
+                let currentOrderEnd = new Date(order.lastRentalDay);
+
+                // Use car arg instead of carToBeDeleted, otherwise risk state not updated yet
+                if (Number(order.carId) == Number(car.id) && currentOrderEnd > today) {
+                    setOrdersToHandle(prev => [...prev, order]); // Add matching car to filtered list
+                }
+            })
+
+            // setOrdersToHandle(respon.data.filter(o => Number(o.carId) == Number(carToDelete.id) ));
+        }).catch(error => {
+            console.log(error);
+        })
+
+        // Get all cars with same type, i.e. substitute cars
+        // (Use car arg instead of carToBeDeleted, otherwise risk state not updated yet)
+        allCars.map(c => {
+            if (c.type.toString().toUpperCase() == car.type.toString().toUpperCase()) {
+                setCarsByType(prev => [...prev, c]);
+            }
+        });
+
+        setShow(true); // Show warning alert, to confirm or cancel delete
+        // deleteCar(car);
+    }
+
+    const deleteCar = () => {
+        console.log(ordersToHandle.length);
+
+        // Handle orders that includes same car id, before delete
+        if (ordersToHandle.length > 0 && carsByType.length > 0) { // If substitute car is available
+            for (var i = 0; i < ordersToHandle.length; i++) {
+                console.log(ordersToHandle[i]);
+                console.log("Yes, substitute");
+                // Update order, and give any of the substitute cars
+                // OrderService.updateOrder();
+            }
+
+        } else if (ordersToHandle.length > 0 && carsByType.length < 0) { // If no substitute car
+            for (var i = 0; i < ordersToHandle.length; i++) {
+                console.log(ordersToHandle[i]);
+                console.log("Nooo substitute");
+                // Update order, and give any of the substitute cars
+                // OrderService.updateOrder();
+            }
+
+        } else {
+            console.log("Nothing to handle");
+        }
+
+
+        // // Delete, with selected car body
+        // CarService.deleteCar(carToDelete).then(res => {
+        //     console.log("Deleted");
+        // });
+
+        // // Also keep all cars except (the deleted) car with this id; so re-renders correct
+        // setAllCars(allCars.filter(c => c.id !== carToDelete.id));
+
+        // Change to not display confirmation box
+        setShow(false);
+    }
+
+    const viewCarDetails = async (e) => {
+        const currentId = await e.target.id;
+        navigate(`/car/${currentId}`); // Note: backticks
+    }
 
     return (
         <div style={{ marginBottom: '5%' }}>
@@ -240,10 +304,11 @@ function ListAllCarsComponent(props) {
                                     </Button>
                                     {" "}
 
-                                    {/* <Button className="delete-btn" variant="danger" onClick={() => deleteCar(car)}>Delete</Button> */}
-                                    {/* (Alternatively assign car.id as id for this row, find car and send to delete request) */}
-
-                                    <Button className="delete-btn" variant="danger" onClick={() => { setShow(true); setCarToDelete(car); }}>Delete</Button>
+                                    {/* // Prepare deletion of car: */}
+                                    <Button className="delete-btn" variant="danger" onClick={() => {
+                                        // setCarToDelete(car);
+                                        prepareDelete(car);
+                                    }}>Delete</Button>
 
                                 </td>
                             </tr>

@@ -90,7 +90,7 @@ function ListAllCustomersComponent(props) {
                 }
                 break;
 
-                case "lName": // Alphabetical
+            case "lName": // Alphabetical
                 let sorted3;
                 for (let i = 0; i < allCustomers.length - 1; i++) {
                     if (allCustomers[i].lName.localeCompare(allCustomers[i + 1].lName) == 1) {
@@ -106,6 +106,26 @@ function ListAllCustomersComponent(props) {
                 } else {
                     setAllCustomers(allCustomers.sort((a, b) => a.lName.localeCompare(b.lName)));
                     setLNameArrow(faSortDown);
+                }
+                break;
+
+            case "numOrders": // Same as regNr, but numerical in this case
+                let sorted4;
+                for (let i = 0; i < allCustomers.length - 1; i++) {
+                    if (allCustomers[i].ordersByCustomer.length > allCustomers[i + 1].ordersByCustomer.length) {
+                        sorted4 = false; // If any is bigger than previous, means unsorted
+                        break;
+                    } else {
+                        sorted4 = true;
+                    }
+                }
+
+                if (sorted4) {
+                    setAllCustomers(allCustomers.sort(function (a, b) { return b.ordersByCustomer.length - a.ordersByCustomer.length }));
+                    setNumOrdersArrow(faSortUp);
+                } else {
+                    setAllCustomers(allCustomers.sort(function (a, b) { return a.ordersByCustomer.length - b.ordersByCustomer.length }));
+                    setNumOrdersArrow(faSortDown);
                 }
                 break;
         }
@@ -136,7 +156,7 @@ function ListAllCustomersComponent(props) {
                             </span></span></th>
                         {/* <th>Address</th> */}
                         <th><span id='numOrders' variant="primary" onClick={sortTable}>
-                            Number of orders <span className="not-clickable-part">
+                            Num of orders <span className="not-clickable-part">
                                 <FontAwesomeIcon icon={numOrdersArrow} />
                             </span></span></th>
                         <th>Actions</th>
@@ -158,17 +178,6 @@ function ListAllCustomersComponent(props) {
                                 <td>
                                     {customer.ordersByCustomer.length}
                                 </td>
-
-                                {/* <td>
-                                    {customer.ordersByCustomer.map((order, index) =>
-                                        <p key={index} style={{ lineHeight: '50%', margin: '1%' }}>
-                                            <Button variant="outline-info" style={{ fontSize: '9px', margin: '1%', padding: '0' }}
-                                                // onClick={() => this.viewTrAccountDetails(acc.id)}
-                                                >
-                                                {order.orderNr + " (Id: " + order.carId + ")"}
-                                            </Button> </p>
-                                    )}
-                                </td> */}
 
                                 <td>
                                     <Button className="neutral-btn info-btn" id={customer.id} variant="primary" onClick={viewCustomerOrders}>
