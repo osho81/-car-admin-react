@@ -37,7 +37,7 @@ function AddCarComponent(props) {
             navigate('/allcars', { replace: true }); // Display all cars if success
         }).catch(error => {
             console.log(error)
-        });;
+        });
     }
 
     // Go back to list for all cars, when canceled

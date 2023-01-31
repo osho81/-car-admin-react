@@ -158,10 +158,10 @@ function ListAllCarsComponent(props) {
     }
 
     const prepareDelete = (car) => {
-        // console.log(car);
-        setCarToDelete(car);
+        setCarToDelete(car); // Set car to delete for later usage in delete function
 
-        setOrdersToHandle([]); // Empty array before each delete-preparation
+        setOrdersToHandle([]); // Empty arrays before each delete-preparation
+        setCarsByType([]) 
 
         OrderService.getAllOrders().then((response) => {
 
@@ -183,7 +183,8 @@ function ListAllCarsComponent(props) {
         // Get all cars with same type, i.e. substitute cars
         // (Use car arg instead of carToBeDeleted, otherwise risk state not updated yet)
         allCars.map(c => {
-            if (c.type.toString().toUpperCase() == car.type.toString().toUpperCase()) {
+            if (c.type.toString().toUpperCase() == car.type.toString().toUpperCase()
+                && Number(c.id) != Number(car.id)) { // Exclude same car
                 setCarsByType(prev => [...prev, c]);
             }
         });
@@ -192,38 +193,82 @@ function ListAllCarsComponent(props) {
         // deleteCar(car);
     }
 
-    const deleteCar = () => {
+    const deleteCar = async () => {
         console.log(ordersToHandle.length);
+        console.log(carsByType.length);
 
         // Handle orders that includes same car id, before delete
         if (ordersToHandle.length > 0 && carsByType.length > 0) { // If substitute car is available
             for (var i = 0; i < ordersToHandle.length; i++) {
                 console.log(ordersToHandle[i]);
-                console.log("Yes, substitute");
+
+                // Create order to send as request body for update order put method
+                const id = ordersToHandle[i].id;
+                const orderNr = ordersToHandle[i].orderNr;
+                const canceled = ordersToHandle[i].canceled;
+                const firstRentalDay = ordersToHandle[i].firstRentalDay;
+                const lastRentalDay = ordersToHandle[i].lastRentalDay;
+                const numberOfDays = ordersToHandle[i].numberOfDays;
+                const customerId = ordersToHandle[i].customerId;
+                const carId = carsByType[0].id; // New value, from first substitute cars list
+                const price = ordersToHandle[i].price;
+                const priceInEuro = ordersToHandle[i].priceInEuro;
+
+                // Created updated-object to pass as request bnody, where only substitute carId is updated
+                let newOrderDetails = { id, orderNr, canceled, firstRentalDay, lastRentalDay, numberOfDays, customerId, carId, price, priceInEuro };
+                // let newOrderDetails = { id, orderNr, carId}; // This would actually be enough for this case
+
                 // Update order, and give any of the substitute cars
-                // OrderService.updateOrder();
+                await OrderService.updateOrder(newOrderDetails).then((response) => {
+                    console.log("Updated and handled pertinent orders");
+                }).catch(error => {
+                    console.log(error)
+                });
             }
 
-        } else if (ordersToHandle.length > 0 && carsByType.length < 0) { // If no substitute car
+         // If no substitute car, cancel orders with deleted car, since no substitutes
+        } else if (ordersToHandle.length > 0 && carsByType.length <= 0) { // If no substitute car
             for (var i = 0; i < ordersToHandle.length; i++) {
                 console.log(ordersToHandle[i]);
                 console.log("Nooo substitute");
+                
+                // Create order to send as request body for update order put method
+                const id = ordersToHandle[i].id;
+                const orderNr = ordersToHandle[i].orderNr;
+                const canceled = true; // Cancel order, since no substitute car of same type!
+                const firstRentalDay = ordersToHandle[i].firstRentalDay;
+                const lastRentalDay = ordersToHandle[i].lastRentalDay;
+                const customerId = ordersToHandle[i].customerId;
+                const carId = ordersToHandle[i].carId; // Keep same car id, since no substitute car of same type
+                const price = ordersToHandle[i].price;
+                const numberOfDays = ordersToHandle[i].numberOfDays;
+                const priceInEuro = ordersToHandle[i].priceInEuro;
+
+                // Created updated-object to pass as request body, where only substitute carId is updated
+                let newOrderDetails = { id, orderNr, canceled }; // Use only needed fields
+                // Note: backend will get original car id, if carId is missing (i.e. "null" or 0) but since it is deleted, it will set carId to zero
+                // An alternative is to send (almost) all field, at least including carId in request body:
+                // let newOrderDetails = { id, orderNr, canceled, firstRentalDay, lastRentalDay, numberOfDays, customerId, carId, price, priceInEuro };
+
                 // Update order, and give any of the substitute cars
-                // OrderService.updateOrder();
+                await OrderService.updateOrder(newOrderDetails).then((response) => {
+                    console.log("Canceled pertinent orders");
+                }).catch(error => {
+                    console.log(error)
+                });
             }
 
         } else {
             console.log("Nothing to handle");
         }
 
-
         // // Delete, with selected car body
-        // CarService.deleteCar(carToDelete).then(res => {
-        //     console.log("Deleted");
-        // });
+        CarService.deleteCar(carToDelete).then(res => {
+            console.log("Deleted");
+        });
 
         // // Also keep all cars except (the deleted) car with this id; so re-renders correct
-        // setAllCars(allCars.filter(c => c.id !== carToDelete.id));
+        setAllCars(allCars.filter(c => c.id !== carToDelete.id));
 
         // Change to not display confirmation box
         setShow(false);
