@@ -2,17 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Card, Form, Button, Container } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import CarService from '../services/CarService';
+import { useKeycloak } from '@react-keycloak/web';
 
 // Collect inputs from user, and send post request to create car
 
 function UpdateCarComponent(props) {
 
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
-    const { id } = useParams(); // get id param from current url
+    const {keycloak, initialized} = useKeycloak()
+
+    const { id } = useParams() // get id param from current url
 
     // Car before update, to display current field values
-    const [car, setCar] = useState('');
+    const [car, setCar] = useState('')
 
     // Car fields, to send to backend post request api
     const [regNr, setRegNr] = useState("")
@@ -31,7 +34,7 @@ function UpdateCarComponent(props) {
     useEffect(() => { // Initial retrieval of customer details/values
 
         async function getCar() {
-            CarService.getAllCars().then((response) => {
+            CarService.getAllCars(keycloak.token).then((response) => {
                 response.data.map((c) => {
                     if (c.id === Number(id)) { // Find specific car
                         setCar(c);

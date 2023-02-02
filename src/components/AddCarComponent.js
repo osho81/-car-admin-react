@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Form, Button, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import CarService from '../services/CarService';
+import { useKeycloak } from '@react-keycloak/web';
 
 // Collect inputs from user, and send post request to create car
 
@@ -9,6 +10,7 @@ function AddCarComponent(props) {
 
     const navigate = useNavigate();
 
+    const {keycloak, initialized} = useKeycloak()
 
     // Car fields, to send to backend post request api
     const [regNr, setRegNr] = useState("")
@@ -33,7 +35,7 @@ function AddCarComponent(props) {
         let car = { regNr, model, type, modelYear, dailySek };
 
         // Send post request wih created object as body
-        CarService.createCar(car).then((response) => {
+        CarService.createCar(car, keycloak.token).then((response) => {
             navigate('/allcars', { replace: true }); // Display all cars if success
         }).catch(error => {
             console.log(error)

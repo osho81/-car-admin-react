@@ -4,6 +4,10 @@ import CarService from '../services/CarService'; // Import class with car functi
 import OrderService from '../services/OrderService';
 import { useNavigate } from 'react-router-dom';
 
+// Keycloak imports (also see npm install of tehse)
+import Keycloak from 'keycloak-js';
+import {useKeycloak} from '@react-keycloak/web'
+
 // Fontawsome for react; combine into an element before usage
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
@@ -26,7 +30,7 @@ function ListAllCarsComponent(props) {
     const [carToDelete, setCarToDelete] = useState("");
 
     // Find out if there is substitute car of same type
-    const [carsByType, setCarsByType] = useState([])
+    const [carsWithSameType, SetCarsWithSameType] = useState([])
 
     // Find out orders that has booked the car to be deleted
     const [ordersToHandle, setOrdersToHandle] = useState([]);
@@ -35,6 +39,9 @@ function ListAllCarsComponent(props) {
 
     const [allCars, setAllCars] = useState([])
 
+    // Set current keycloak after auhtorization
+    const {keycloak, initialized} = useKeycloak()
+
     // Populate the arrays we need to render needed data
     useEffect(() => {
 
@@ -42,18 +49,20 @@ function ListAllCarsComponent(props) {
         const getListCars = () => {
             setisLoading(true);
 
-            CarService.getAllCars().then((response) => {
+            // Include bearer token from keycloak, as arg
+            CarService.getAllCars(keycloak.token).then((response) => {
                 setAllCars(response.data); // Populate initial account array values
-
             }).catch(error => {
                 console.log(error);
             })
+
             setisLoading(false);
         }
 
         getListCars();
+        // console.log(keycloak.token);
 
-    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    }, [props]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const sortTable = async (e) => {
         // Get id from clicked sort span-btn i tablehead
@@ -161,7 +170,7 @@ function ListAllCarsComponent(props) {
         setCarToDelete(car); // Set car to delete for later usage in delete function
 
         setOrdersToHandle([]); // Empty arrays before each delete-preparation
-        setCarsByType([]) 
+        SetCarsWithSameType([])
 
         OrderService.getAllOrders().then((response) => {
 
@@ -185,7 +194,7 @@ function ListAllCarsComponent(props) {
         allCars.map(c => {
             if (c.type.toString().toUpperCase() == car.type.toString().toUpperCase()
                 && Number(c.id) != Number(car.id)) { // Exclude same car
-                setCarsByType(prev => [...prev, c]);
+                SetCarsWithSameType(prev => [...prev, c]);
             }
         });
 
@@ -195,10 +204,10 @@ function ListAllCarsComponent(props) {
 
     const deleteCar = async () => {
         console.log(ordersToHandle.length);
-        console.log(carsByType.length);
+        console.log(carsWithSameType.length);
 
         // Handle orders that includes same car id, before delete
-        if (ordersToHandle.length > 0 && carsByType.length > 0) { // If substitute car is available
+        if (ordersToHandle.length > 0 && carsWithSameType.length > 0) { // If substitute car is available
             for (var i = 0; i < ordersToHandle.length; i++) {
                 console.log(ordersToHandle[i]);
 
@@ -210,7 +219,7 @@ function ListAllCarsComponent(props) {
                 const lastRentalDay = ordersToHandle[i].lastRentalDay;
                 const numberOfDays = ordersToHandle[i].numberOfDays;
                 const customerId = ordersToHandle[i].customerId;
-                const carId = carsByType[0].id; // New value, from first substitute cars list
+                const carId = carsWithSameType[0].id; // New value, from first substitute cars list
                 const price = ordersToHandle[i].price;
                 const priceInEuro = ordersToHandle[i].priceInEuro;
 
@@ -226,12 +235,12 @@ function ListAllCarsComponent(props) {
                 });
             }
 
-         // If no substitute car, cancel orders with deleted car, since no substitutes
-        } else if (ordersToHandle.length > 0 && carsByType.length <= 0) { // If no substitute car
+            // If no substitute car, cancel orders with deleted car, since no substitutes
+        } else if (ordersToHandle.length > 0 && carsWithSameType.length <= 0) { // If no substitute car
             for (var i = 0; i < ordersToHandle.length; i++) {
                 console.log(ordersToHandle[i]);
                 console.log("Nooo substitute");
-                
+
                 // Create order to send as request body for update order put method
                 const id = ordersToHandle[i].id;
                 const orderNr = ordersToHandle[i].orderNr;
@@ -280,7 +289,7 @@ function ListAllCarsComponent(props) {
     }
 
     return (
-        <div style={{ marginBottom: '5%' }}>
+        <div style={{ marginBottom: '5%', fontSize: "12px" }}>
 
             {/* Div for alert/popup-confirmation box:  */}
             <div style={{ position: "fixed", marginLeft: "25%" }}>
@@ -301,7 +310,7 @@ function ListAllCarsComponent(props) {
                 {/* {!show && <Button onClick={() => setShow(true)}>Show Alert</Button>} */}
             </div>
 
-            <h2 className='list-header'>All Cars</h2>
+            <h3 className='list-header'>All Cars</h3>
             <Table striped bordered hover>
                 <thead>
                     <tr>
@@ -320,7 +329,7 @@ function ListAllCarsComponent(props) {
                                 <FontAwesomeIcon icon={modelArrow} />
                             </span></span></th>
                         <th><span id='modelYear' variant="primary" onClick={sortTable}>
-                            Model Year<span className="not-clickable-part">
+                            Model Year <span className="not-clickable-part">
                                 <FontAwesomeIcon icon={modelYearArrow} />
                             </span></span></th>
                         <th><span id='dailySek' variant="primary" onClick={sortTable}>
@@ -341,7 +350,7 @@ function ListAllCarsComponent(props) {
                                 <td> {car.model}</td>
                                 <td> {car.modelYear}</td>
                                 <td> {car.dailySek}</td>
-                                <td>
+                                <td className='btns-td'>
 
                                     <Button className="neutral-btn info-btn" id={car.id} variant="primary" onClick={viewCarDetails}>
                                         <span className="not-clickable-part"><FontAwesomeIcon icon={faInfo} />

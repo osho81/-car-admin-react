@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CarService from '../services/CarService';
 import { Card, Table, Container, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useKeycloak } from '@react-keycloak/web';
 
 // Fontawsome for react; combine into an element before usage
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,6 +12,8 @@ function ViewCarComponent(props) {
 
     const navigate = useNavigate();
 
+    const {keycloak, initialized} = useKeycloak()
+
     // Variables, states
     const [car, setCar] = useState('');
     const { id } = useParams(); // get id param from current url
@@ -19,7 +22,7 @@ function ViewCarComponent(props) {
     useEffect(() => { // Get customer with aquired
 
         async function getCar() {
-            CarService.getAllCars().then((response) => {
+            CarService.getAllCars(keycloak.token).then((response) => {
                 response.data.map((c) => {
                     if (c.id === Number(id)) { // Find specific car
                         setCar(c);
@@ -46,7 +49,7 @@ function ViewCarComponent(props) {
 
 
     return (
-        <Container style={{ marginTop: '3%', marginLeft: '12,5%', marginBottom: '5%', width: '75%', justifyContent: 'center' }}>
+        <Container style={{ marginTop: '3%', marginLeft: '12,5%', marginBottom: '5%', width: '75%', justifyContent: 'center', fontSize: "12px" }}>
 
             <Card style={{ marginLeft: '15%', width: '70%' }}>
                 <Card.Body>

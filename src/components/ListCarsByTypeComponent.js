@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, Table, Button } from 'react-bootstrap';
 import CarService from '../services/CarService'; // Import class with car functions
+import OrderService from '../services/OrderService';
+
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
+
+import {useKeycloak} from '@react-keycloak/web'
 
 // For more comments see ListALlCarsComponent
 
@@ -25,14 +29,25 @@ function ListCarsByTypeComponent(props) {
 
     const [carsByType, setCarsByType] = useState([])
 
+    // Find out if there is substitute car of same type
+    // same as carsByType, minus the car to delete
+    const [carsWithSameType, SetCarsWithSameType] = useState([])
+
+    // Find out orders that has booked the car to be deleted
+    const [ordersToHandle, setOrdersToHandle] = useState([]);
+
+    const {keycloak, initialized} = useKeycloak()
+
+
     // Populate the arrays we need to render needed data
     useEffect(() => {
+
         // Get a list of all cars
         const getListCars = () => {
             setisLoading(true);
             setCarsByType([]);// Empty array on each render
 
-            CarService.getAllCars().then((response) => {
+            CarService.getAllCars(keycloak.token).then((response) => {
 
                 response.data.map((car) => {
                     if (car.type === props.type.toString().toUpperCase()) {
@@ -52,21 +67,6 @@ function ListCarsByTypeComponent(props) {
 
     }, [props]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const deleteCar = () => {
-
-        CarService.deleteCar(carToDelete).then(res => {
-            console.log("Deleted");
-        });
-
-        setCarsByType(carsByType.filter(c => c.id !== carToDelete.id));
-
-        setShow(false);
-    }
-
-    const viewCarDetails = async (e) => {
-        const currentId = await e.target.id;
-        navigate(`/car/${currentId}`); // Note: backticks
-    }
 
     const sortTable = async (e) => {
         const currentId = await e.target.id;
@@ -168,10 +168,130 @@ function ListCarsByTypeComponent(props) {
         navigate(`/${props.type.toString().toLowerCase()}cars`);
     }
 
+    const prepareDelete = (car) => {
+        setCarToDelete(car); // Set car to delete for later usage in delete function
 
+        setOrdersToHandle([]); // Empty arrays before each delete-preparation
+        SetCarsWithSameType([])
+
+        OrderService.getAllOrders().then((response) => {
+
+            response.data.map((order) => {
+                let today = new Date(); // To filter out old orders
+                let currentOrderEnd = new Date(order.lastRentalDay);
+
+                // Use car arg instead of carToBeDeleted, otherwise risk state not updated yet
+                if (Number(order.carId) == Number(car.id) && currentOrderEnd > today) {
+                    setOrdersToHandle(prev => [...prev, order]); // Add matching car to filtered list
+                }
+            })
+
+            // setOrdersToHandle(respon.data.filter(o => Number(o.carId) == Number(carToDelete.id) ));
+        }).catch(error => {
+            console.log(error);
+        })
+
+        // Get all cars with same type, i.e. substitute cars
+        // (Use car arg instead of carToBeDeleted, otherwise risk state not updated yet)
+        carsByType.map(c => {
+            if (c.type.toString().toUpperCase() == car.type.toString().toUpperCase()
+                && Number(c.id) != Number(car.id)) { // Exclude same car
+                SetCarsWithSameType(prev => [...prev, c]);
+            }
+        });
+
+        setShow(true); // Show warning alert, to confirm or cancel delete
+        // deleteCar(car);
+    }
+
+    const deleteCar = async () => {
+        console.log(ordersToHandle.length);
+        console.log(carsWithSameType.length);
+
+        // Handle orders that includes same car id, before delete
+        if (ordersToHandle.length > 0 && carsWithSameType.length > 0) { // If substitute car is available
+            for (var i = 0; i < ordersToHandle.length; i++) {
+                console.log(ordersToHandle[i]);
+
+                // Create order to send as request body for update order put method
+                const id = ordersToHandle[i].id;
+                const orderNr = ordersToHandle[i].orderNr;
+                const canceled = ordersToHandle[i].canceled;
+                const firstRentalDay = ordersToHandle[i].firstRentalDay;
+                const lastRentalDay = ordersToHandle[i].lastRentalDay;
+                const numberOfDays = ordersToHandle[i].numberOfDays;
+                const customerId = ordersToHandle[i].customerId;
+                const carId = carsWithSameType[0].id; // New value, from first substitute cars list
+                const price = ordersToHandle[i].price;
+                const priceInEuro = ordersToHandle[i].priceInEuro;
+
+                // Created updated-object to pass as request bnody, where only substitute carId is updated
+                let newOrderDetails = { id, orderNr, canceled, firstRentalDay, lastRentalDay, numberOfDays, customerId, carId, price, priceInEuro };
+                // let newOrderDetails = { id, orderNr, carId}; // This would actually be enough for this case
+
+                // Update order, and give any of the substitute cars
+                await OrderService.updateOrder(newOrderDetails).then((response) => {
+                    console.log("Updated and handled pertinent orders");
+                }).catch(error => {
+                    console.log(error)
+                });
+            }
+
+            // If no substitute car, cancel orders with deleted car, since no substitutes
+        } else if (ordersToHandle.length > 0 && carsWithSameType.length <= 0) { // If no substitute car
+            for (var i = 0; i < ordersToHandle.length; i++) {
+                console.log(ordersToHandle[i]);
+                console.log("Nooo substitute");
+
+                // Create order to send as request body for update order put method
+                const id = ordersToHandle[i].id;
+                const orderNr = ordersToHandle[i].orderNr;
+                const canceled = true; // Cancel order, since no substitute car of same type!
+                const firstRentalDay = ordersToHandle[i].firstRentalDay;
+                const lastRentalDay = ordersToHandle[i].lastRentalDay;
+                const customerId = ordersToHandle[i].customerId;
+                const carId = ordersToHandle[i].carId; // Keep same car id, since no substitute car of same type
+                const price = ordersToHandle[i].price;
+                const numberOfDays = ordersToHandle[i].numberOfDays;
+                const priceInEuro = ordersToHandle[i].priceInEuro;
+
+                // Created updated-object to pass as request body, where only substitute carId is updated
+                let newOrderDetails = { id, orderNr, canceled }; // Use only needed fields
+                // Note: backend will get original car id, if carId is missing (i.e. "null" or 0) but since it is deleted, it will set carId to zero
+                // An alternative is to send (almost) all field, at least including carId in request body:
+                // let newOrderDetails = { id, orderNr, canceled, firstRentalDay, lastRentalDay, numberOfDays, customerId, carId, price, priceInEuro };
+
+                // Update order, and give any of the substitute cars
+                await OrderService.updateOrder(newOrderDetails).then((response) => {
+                    console.log("Canceled pertinent orders");
+                }).catch(error => {
+                    console.log(error)
+                });
+            }
+
+        } else {
+            console.log("Nothing to handle");
+        }
+
+        // // Delete, with selected car body
+        CarService.deleteCar(carToDelete).then(res => {
+            console.log("Deleted");
+        });
+
+        // // Also keep all cars except (the deleted) car with this id; so re-renders correct
+        setCarsByType(carsByType.filter(c => c.id !== carToDelete.id));
+
+        // Change to not display confirmation box
+        setShow(false);
+    }
+
+    const viewCarDetails = async (e) => {
+        const currentId = await e.target.id;
+        navigate(`/car/${currentId}`); // Note: backticks
+    }
 
     return (
-        <div style={{ marginBottom: '5%' }}>
+        <div style={{ marginBottom: '5%', fontSize: "12px" }}>
 
             <div style={{ position: "fixed", marginLeft: "25%" }}>
                 <Alert show={show} variant="danger">
@@ -189,7 +309,7 @@ function ListCarsByTypeComponent(props) {
                 </Alert>
             </div>
 
-            <h2 className='list-header'>Cars</h2>
+            <h3 className='list-header'>Cars</h3>
             <Table striped bordered hover>
                 <thead>
                     <tr>
@@ -208,7 +328,7 @@ function ListCarsByTypeComponent(props) {
                                 <FontAwesomeIcon icon={modelArrow} />
                             </span></span></th>
                         <th><span id='modelYear' variant="primary" onClick={sortTable}>
-                            Model Year<span className="not-clickable-part">
+                            Model Year <span className="not-clickable-part">
                                 <FontAwesomeIcon icon={modelYearArrow} />
                             </span></span></th>
                         <th><span id='dailySek' variant="primary" onClick={sortTable}>
@@ -229,18 +349,20 @@ function ListCarsByTypeComponent(props) {
                                 <td> {car.model}</td>
                                 <td> {car.modelYear}</td>
                                 <td> {car.dailySek}</td>
-                                <td>
+                                <td className='btns-td'>
 
                                     <Button className="neutral-btn info-btn" id={car.id} variant="primary" onClick={viewCarDetails}>
                                         <span className="not-clickable-part"><FontAwesomeIcon icon={faInfo} />
                                         </span>
-                                    </Button>
-                                    {" "}
+                                    </Button>{" "}
 
-                                    {/* <Button className="delete-btn" variant="danger" onClick={() => deleteCar(car)}>Delete</Button> */}
-                                    {/* (Alternatively assign car.id as id for this row, find car and send to delete request) */}
+                                    {/* // Prepare deletion of car: */}
+                                    <Button className="delete-btn" variant="danger" onClick={() => {
+                                        // setCarToDelete(car);
+                                        prepareDelete(car);
+                                    }}>Delete</Button>
 
-                                    <Button className="delete-btn" variant="danger" onClick={() => { setShow(true); setCarToDelete(car); }}>Delete</Button>
+
 
                                 </td>
                             </tr>

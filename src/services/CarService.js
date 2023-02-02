@@ -2,12 +2,18 @@ import axios from "axios";
 
 class CarService {
 
-    getAllCars() { // Class function
-        return axios.get("http://localhost:9090/api/v1/cars");
+    getAllCars(bearerTtoken) { // Class function
+        const config = {
+            headers: { Authorization: `Bearer ${bearerTtoken}` }
+        };
+        return axios.get("http://localhost:9090/api/v1/cars", config );
     }
 
-    createCar(car) { 
-        return axios.post("http://localhost:9090/api/v1/addcar", car);
+    createCar(car, bearerTtoken) { 
+        const config = {
+            headers: { Authorization: `Bearer ${bearerTtoken}` }
+        };
+        return axios.post("http://localhost:9090/api/v1/addcar", car, config);
     }
 
     updateCar(car) {

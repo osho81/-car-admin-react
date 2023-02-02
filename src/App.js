@@ -7,56 +7,98 @@ import FooterComponent from './components/FooterComponent';
 import ListAllCarsComponent from './components/ListAllCarsComponent';
 import ListCarsByTypeComponent from './components/ListCarsByTypeComponent';
 import AddCarComponent from './components/AddCarComponent';
-import ListCustomersComponent from  './components/ListCustomersComponent';
+import ListCustomersComponent from './components/ListCustomersComponent';
 import ViewCustomerComponent from './components/ViewCustomerComponent';
 import ViewCarComponent from './components/ViewCarComponent';
 import UpdateCarComponent from './components/UpdateCarComponent';
 
+// Keycloak:
+// import keycloak from "./Keycloak" // This was used to import file with keycloak-js configs
+import Keycloak from "keycloak-js";
+import { ReactKeycloakProvider } from "@react-keycloak/web";
+// see keycloak elements in returned code hereunder
+
 // Arrange routing hierarchy and structure
 function App() {
+
+  // Keycloag configurations 
+  const keycloak = new Keycloak({
+    url: "http://localhost:8080", // Auth not needed with Quarkus-keycloak
+    realm: "car-rental-realm",
+    clientId: "car-rental-v100",
+    //  onLoad: 'login-required' 
+  });
+
+  const keycloakProviderInitConfig = {
+    onLoad: 'login-required',
+  }
+
+  // keycloak.onTokenExpired = () => {
+  //   console.log('token expired', keycloak.token);
+  //   keycloak.updateToken(1).then(() => {
+  //     console.log('successfully get a new token', keycloak.token);
+  //   })
+  //     .catch(error => {
+  //       console.log(error);
+  //     })
+  // }
+
+  // keycloak.onTokenExpired = () => {
+  //   keycloak.updateToken(5)
+  //     .then(function (refreshed) {
+  //       if (refreshed) {
+  //         alert('Token was successfully refreshed');
+  //       } else {
+  //         alert('Token is still valid');
+  //       }
+  //     }).catch(function () {
+  //       alert('Failed to refresh the token, or the session has expired');
+  //     });
+
+  //     console.log(keycloak.token);
+  // }
+
+
   return (
     <div>
-      <Router>
-        <HeaderComponent />
-        <div className="container">
-          <Routes>
-            <Route path="/" element={< WelcomeComponent />} exact></Route>
 
-            {/* Customer related rendering  */}
-            {/* <Route path="/customers" element={< ListCustomerComponent />}></Route>
-            <Route path="/view-customer/:id" element={<ViewCustomerComponent />}></Route>
-            <Route path="/create-customer/:id" element={<CreateCustomerComponent />}></Route>
-            <Route path="/update-customer/:id" element={<UpdateCustomerComponent />}></Route> */}
+      <ReactKeycloakProvider
+        authClient={keycloak}
+        // keycloak={keycloak}
+        initOptions={keycloakProviderInitConfig}
+      // initConfig={keycloakProviderInitConfig}
+      // initOptions={{ onLoad: 'login-required' }}
+      >
+        <Router>
+          <HeaderComponent />
+          <div className="container">
+            <Routes>
+              <Route path="/" element={< WelcomeComponent />} exact></Route>
 
-            {/* TransactionAccount related rendering  */}
-            {/* <Route path="/tr-accounts" element={< ListTransactionAccountComponent />}></Route>
-            <Route path="/view-traccount/:id" element={< ViewTrAccountComponent />}></Route>
-            <Route path="/create-traccount/:id" element={<CreateTrAccountComponent />}></Route>
-            <Route path="/update-traccount/:id" element={<UpdateTrAccountComponent />}></Route> */}
+              {/* Car related rendering */}
+              <Route path="/allcars" element={<ListAllCarsComponent />}></Route>
+              <Route path="/customers" element={<ListCustomersComponent />}></Route>
 
-            {/* Car related rendering */}
-            <Route path="/allcars" element={<ListAllCarsComponent />}></Route>
-            <Route path="/customers" element={<ListCustomersComponent />}></Route>
+              {/* Send in props.type or other data from this parent to these children: */}
+              <Route path="/minicars" element={<ListCarsByTypeComponent type="mini" />}></Route>
+              <Route path="/sedancars" element={<ListCarsByTypeComponent type="sedan" />}></Route>
+              <Route path="/sportcars" element={<ListCarsByTypeComponent type="sport" />}></Route>
+              <Route path="/cabcars" element={<ListCarsByTypeComponent type="cab" />}></Route>
+              <Route path="/suvcars" element={<ListCarsByTypeComponent type="suv" />}></Route>
+              <Route path="/buscars" element={<ListCarsByTypeComponent type="bus" />}></Route>
 
-            {/* Send in props.type or other data from this parent to these children: */}
-            <Route path="/minicars" element={<ListCarsByTypeComponent type="mini" />}></Route>
-            <Route path="/sedancars" element={<ListCarsByTypeComponent type="sedan" />}></Route>
-            <Route path="/sportcars" element={<ListCarsByTypeComponent type="sport" />}></Route>
-            <Route path="/cabcars" element={<ListCarsByTypeComponent type="cab" />}></Route>
-            <Route path="/suvcars" element={<ListCarsByTypeComponent type="suv" />}></Route>
-            <Route path="/buscars" element={<ListCarsByTypeComponent type="bus" />}></Route>
+              <Route path="/addcar" element={<AddCarComponent />}></Route>
 
-            <Route path="/addcar" element={<AddCarComponent />}></Route>
+              <Route path="/customer/:id" element={<ViewCustomerComponent />}></Route>
+              <Route path="/car/:id" element={<ViewCarComponent />}></Route>
 
-            <Route path="/customer/:id" element={<ViewCustomerComponent />}></Route>
-            <Route path="/car/:id" element={<ViewCarComponent />}></Route>
+              <Route path="/update-car-view/:id" element={<UpdateCarComponent />}></Route>
 
-            <Route path="/update-car-view/:id" element={<UpdateCarComponent />}></Route>
-
-          </Routes>
-        </div>
-        <FooterComponent />
-      </Router>
+            </Routes>
+          </div>
+          <FooterComponent />
+        </Router>
+      </ReactKeycloakProvider>
     </div>
   );
 }

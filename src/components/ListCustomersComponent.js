@@ -134,8 +134,8 @@ function ListAllCustomersComponent(props) {
     }
 
     return (
-        <div style={{ width: "60%", marginLeft: '20%', marginBottom: '5%' }}>
-            <h2 className='list-header'>All Customers</h2>
+        <div style={{ width: "60%", marginLeft: '20%', marginBottom: '5%', fontSize: "12px" }}>
+            <h3 className='list-header'>All Customers</h3>
             <Table striped bordered hover>
                 <thead>
                     <tr>
@@ -179,7 +179,7 @@ function ListAllCustomersComponent(props) {
                                     {customer.ordersByCustomer.length}
                                 </td>
 
-                                <td>
+                                <td className='btns-td'>
                                     <Button className="neutral-btn info-btn" id={customer.id} variant="primary" onClick={viewCustomerOrders}>
                                         <span className="not-clickable-part"><FontAwesomeIcon icon={faInfo} />
                                         </span>
