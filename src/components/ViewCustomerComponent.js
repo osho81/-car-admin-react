@@ -7,9 +7,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
+import { useKeycloak } from '@react-keycloak/web';
+
 function ViewCustomerComponent(props) {
 
     const navigate = useNavigate();
+
+    const { keycloak, initialized } = useKeycloak();
 
     const [showOrNot, setShowOrNot] = useState("none"); // Display: none
 
@@ -24,7 +28,7 @@ function ViewCustomerComponent(props) {
     useEffect(() => { // Get customer with aquired
 
         async function getCust() {
-            CustomerService.getAllCustomers().then((response) => {
+            CustomerService.getAllCustomers(keycloak.token).then((response) => {
                 response.data.map((customer) => {
                     if (customer.id === Number(id)) { // Find specific customer
                         setCustomer(customer);
@@ -108,7 +112,7 @@ function ViewCustomerComponent(props) {
             </Card>
 
             {/* Alert box in case orders are empty; instead of rendering table of orders */}
-            <div style={{  width: "40%",  marginLeft: '30%', marginTop: "1%" }}>
+            <div style={{ width: "40%", marginLeft: '30%', marginTop: "1%" }}>
                 <Alert show={show} variant="info">
                     <h6>Customer with id {customer.id} has no orders yet</h6>
                     <div className="d-flex justify-content-center">

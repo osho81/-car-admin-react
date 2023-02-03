@@ -7,11 +7,15 @@ import CustomerService from '../services/CustomerService';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo, faSortUp, faSortDown } from "@fortawesome/free-solid-svg-icons";
 
+import { useKeycloak } from '@react-keycloak/web';
+
 // For more comments see ListAllCarsComponent
 
 function ListAllCustomersComponent(props) {
 
     const navigate = useNavigate();
+
+    const { keycloak, initialized } = useKeycloak();
 
     const [ssnArrow, setSsnArrow] = useState(faSortDown);
     const [emailArrow, setEmailArrow] = useState(faSortDown);
@@ -26,7 +30,7 @@ function ListAllCustomersComponent(props) {
         const getAllCustomers = () => {
             setisLoading(true);
 
-            CustomerService.getAllCustomers().then((response) => {
+            CustomerService.getAllCustomers(keycloak.token).then((response) => {
                 setAllCustomers(response.data);
 
             }).catch(error => {

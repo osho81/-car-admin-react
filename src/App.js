@@ -1,9 +1,11 @@
 import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import WelcomeComponent from './components/WelcomeComponent';
 import HeaderComponent from './components/HeaderComponent';
 import FooterComponent from './components/FooterComponent';
+
+import WelcomeComponent from './components/WelcomeComponent';
+import AdminInfoComponent from './components/AdminInfoComponent';
 import ListAllCarsComponent from './components/ListAllCarsComponent';
 import ListCarsByTypeComponent from './components/ListCarsByTypeComponent';
 import AddCarComponent from './components/AddCarComponent';
@@ -33,31 +35,6 @@ function App() {
     onLoad: 'login-required',
   }
 
-  // keycloak.onTokenExpired = () => {
-  //   console.log('token expired', keycloak.token);
-  //   keycloak.updateToken(1).then(() => {
-  //     console.log('successfully get a new token', keycloak.token);
-  //   })
-  //     .catch(error => {
-  //       console.log(error);
-  //     })
-  // }
-
-  // keycloak.onTokenExpired = () => {
-  //   keycloak.updateToken(5)
-  //     .then(function (refreshed) {
-  //       if (refreshed) {
-  //         alert('Token was successfully refreshed');
-  //       } else {
-  //         alert('Token is still valid');
-  //       }
-  //     }).catch(function () {
-  //       alert('Failed to refresh the token, or the session has expired');
-  //     });
-
-  //     console.log(keycloak.token);
-  // }
-
 
   return (
     <div>
@@ -66,7 +43,6 @@ function App() {
         authClient={keycloak}
         // keycloak={keycloak}
         initOptions={keycloakProviderInitConfig}
-      // initConfig={keycloakProviderInitConfig}
       // initOptions={{ onLoad: 'login-required' }}
       >
         <Router>
@@ -74,6 +50,7 @@ function App() {
           <div className="container">
             <Routes>
               <Route path="/" element={< WelcomeComponent />} exact></Route>
+              <Route path="/admininfo" element={< AdminInfoComponent />}></Route>
 
               {/* Car related rendering */}
               <Route path="/allcars" element={<ListAllCarsComponent />}></Route>

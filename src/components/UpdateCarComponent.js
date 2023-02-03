@@ -56,15 +56,15 @@ function UpdateCarComponent(props) {
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
 
-    // Create car with field inputs, send as request body in a post request
-    const createCar = (e) => {
+    // Update  car with field inputs, send as request body in a post request
+    const createCar = (e) => { // create = update, i.e. "re-create"
         e.preventDefault();
 
         // Update object with field inputs, to send as request body
         let carToUpdate = { id, regNr, model, type, modelYear, dailySek };
 
         // Send post request wih created object as body
-        CarService.updateCar(carToUpdate).then((response) => {
+        CarService.updateCar(carToUpdate, keycloak.token).then((response) => {
             navigate(`/car/${car.id}`); // Display updated car on success
         }).catch(error => {
             console.log(error)

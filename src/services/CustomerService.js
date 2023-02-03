@@ -2,8 +2,11 @@ import axios from "axios";
 
 class CustomerService {
 
-    getAllCustomers() {
-        return axios.get("http://localhost:9090/api/v1/customers");
+    getAllCustomers(bearerTtoken) {
+        const config = {
+            headers: { Authorization: `Bearer ${bearerTtoken}` }
+        };
+        return axios.get("http://localhost:9090/api/v1/customers", config);
     }
 
     // getCustomerById(id) {
@@ -27,11 +30,6 @@ class CustomerService {
     //         })
     //     return currentCustomer;
     // }
-
-    // createCar(car) { 
-    //     return axios.post("http://localhost:9090/api/v1/addcar", car);
-    // }
-
 
 }
 

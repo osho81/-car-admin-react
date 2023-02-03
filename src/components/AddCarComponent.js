@@ -54,7 +54,7 @@ function AddCarComponent(props) {
                 {/* Card has 75% width of the container's 75% screen width */}
                 <Card style={{ marginLeft: '20%', width: '60%' }}>
                     <Card.Body>
-                        <Card.Title style={{ fontSize: 24 }} > Customer details</Card.Title>
+                        <Card.Title style={{ fontSize: 24 }} > Car details</Card.Title>
                         <Card.Text>
                             Please enter car details and press submit when done
                         </Card.Text>
