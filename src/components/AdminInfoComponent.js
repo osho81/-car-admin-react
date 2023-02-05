@@ -15,16 +15,18 @@ function AdminInfoComponent(props) {
         // During dev, to see keycloak details
         const updateKeycl = () => {
             keycloak.updateToken(30).then(function () {
-                console.log(keycloak.token);
+                console.log(keycloak);
+                console.log(keycloak.realmAccess.roles.includes("admin") ? "yes" : "no");
             }).catch(function () {
-                alert('Failed to refresh token');
+                console.log('Failed to refresh token');
             });
         }
 
         const loadKeycl = () => {
             keycloak.loadUserProfile()
                 .then(function (profile) {
-                    console.log(JSON.stringify(profile, null, "  "))
+                    // console.log(JSON.stringify(profile, null, "  "));
+                    console.log(typeof profile);
                 }).catch(function () {
                     console.log('Failed to load user profile');
                 });
@@ -32,7 +34,7 @@ function AdminInfoComponent(props) {
         loadKeycl();
         updateKeycl();
 
-    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    }, [keycloak]) // eslint-disable-line react-hooks/exhaustive-deps
 
 
 

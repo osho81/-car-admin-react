@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import HeaderComponent from './components/HeaderComponent';
 import FooterComponent from './components/FooterComponent';
 
@@ -35,15 +35,16 @@ function App() {
     onLoad: 'login-required',
   }
 
+  // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
 
       <ReactKeycloakProvider
         authClient={keycloak}
-        // keycloak={keycloak}
+        keycloak={keycloak}
         initOptions={keycloakProviderInitConfig}
-      // initOptions={{ onLoad: 'login-required' }}
+        // initOptions={{ onLoad: 'login-required' }}
       >
         <Router>
           <HeaderComponent />
@@ -75,6 +76,7 @@ function App() {
           </div>
           <FooterComponent />
         </Router>
+
       </ReactKeycloakProvider>
     </div>
   );
