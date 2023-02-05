@@ -4,9 +4,11 @@ import CarService from '../services/CarService'; // Import class with car functi
 import OrderService from '../services/OrderService';
 import { useNavigate } from 'react-router-dom';
 
+import LoadingSpinnerComponent from './LoadingSpinnerComponent';
+
 // Keycloak imports (also see npm install of tehse)
 import Keycloak from 'keycloak-js';
-import {useKeycloak} from '@react-keycloak/web'
+import { useKeycloak } from '@react-keycloak/web'
 
 // Fontawsome for react; combine into an element before usage
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,31 +37,33 @@ function ListAllCarsComponent(props) {
     // Find out orders that has booked the car to be deleted
     const [ordersToHandle, setOrdersToHandle] = useState([]);
 
-    const [isLoading, setisLoading] = useState(false) // Control rendering; optional
+    const [isLoading, setisLoading] = useState(true) // Control rendering; optional
 
     const [allCars, setAllCars] = useState([])
 
     // Set current keycloak after auhtorization
-    const {keycloak, initialized} = useKeycloak()
+    const { keycloak, initialized } = useKeycloak()
 
     // Populate the arrays we need to render needed data
     useEffect(() => {
 
+        setisLoading(true);
         // Get a list of all cars
         const getListCars = () => {
-            setisLoading(true);
-
             // Include bearer token from keycloak, as arg
             CarService.getAllCars(keycloak.token).then((response) => {
                 setAllCars(response.data); // Populate initial account array values
+                setisLoading(false);
             }).catch(error => {
                 console.log(error);
             })
 
-            setisLoading(false);
         }
 
-        getListCars();
+        // Artificial delay, for loading spinne; estetic reason
+        // Artifical delay, for waiting for useKeycloak; logical reason
+        setTimeout(getListCars, 750); 
+        // getListCars();
         // console.log(keycloak.token);
 
     }, [props]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -310,72 +314,81 @@ function ListAllCarsComponent(props) {
                 {/* {!show && <Button onClick={() => setShow(true)}>Show Alert</Button>} */}
             </div>
 
+
             <h3 className='list-header'>All Cars</h3>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        {/* Add span-btns for sorting methods */}
-                        <th><span id='id' variant="primary" onClick={sortTable}>
-                            # <span className="not-clickable-part">
-                                <FontAwesomeIcon icon={idArrow} />
-                            </span></span></th>
-                        <th><span id='regNr' variant="primary" onClick={sortTable}>
-                            Reg. Nr <span className="not-clickable-part">
-                                <FontAwesomeIcon icon={regNrArrow} />
-                            </span></span></th>
-                        <th>Type</th>
-                        <th><span id='model' variant="primary" onClick={sortTable}>
-                            Model <span className="not-clickable-part">
-                                <FontAwesomeIcon icon={modelArrow} />
-                            </span></span></th>
-                        <th><span id='modelYear' variant="primary" onClick={sortTable}>
-                            Model Year <span className="not-clickable-part">
-                                <FontAwesomeIcon icon={modelYearArrow} />
-                            </span></span></th>
-                        <th><span id='dailySek' variant="primary" onClick={sortTable}>
-                            SEK/day <span className="not-clickable-part">
-                                <FontAwesomeIcon icon={dailySekArrow} />
-                            </span></span></th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
 
-                <tbody style={{ fontWeight: 500 }}>
-                    {allCars.map((car) => {
-                        return (
-                            <tr key={car.id}>
-                                <td> {car.id} </td>
-                                <td> {car.regNr} </td>
-                                <td> {car.type}</td>
-                                <td> {car.model}</td>
-                                <td> {car.modelYear}</td>
-                                <td> {car.dailySek}</td>
-                                <td className='btns-td'>
+            {/* Render loading spinner if data is not yet loaded: */}
+            {isLoading ? < LoadingSpinnerComponent /> :
 
-                                    <Button className="neutral-btn info-btn" id={car.id} variant="primary" onClick={viewCarDetails}>
-                                        <span className="not-clickable-part"><FontAwesomeIcon icon={faInfo} />
-                                        </span>
-                                    </Button>
-                                    {" "}
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            {/* Add span-btns for sorting methods */}
+                            <th><span id='id' variant="primary" onClick={sortTable}>
+                                # <span className="not-clickable-part">
+                                    <FontAwesomeIcon icon={idArrow} />
+                                </span></span></th>
+                            <th><span id='regNr' variant="primary" onClick={sortTable}>
+                                Reg. Nr <span className="not-clickable-part">
+                                    <FontAwesomeIcon icon={regNrArrow} />
+                                </span></span></th>
+                            <th>Type</th>
+                            <th><span id='model' variant="primary" onClick={sortTable}>
+                                Model <span className="not-clickable-part">
+                                    <FontAwesomeIcon icon={modelArrow} />
+                                </span></span></th>
+                            <th><span id='modelYear' variant="primary" onClick={sortTable}>
+                                Model Year <span className="not-clickable-part">
+                                    <FontAwesomeIcon icon={modelYearArrow} />
+                                </span></span></th>
+                            <th><span id='dailySek' variant="primary" onClick={sortTable}>
+                                SEK/day <span className="not-clickable-part">
+                                    <FontAwesomeIcon icon={dailySekArrow} />
+                                </span></span></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
 
-                                    {/* // Prepare deletion of car: */}
-                                    <Button className="delete-btn" variant="danger" onClick={() => {
-                                        // setCarToDelete(car);
-                                        prepareDelete(car);
-                                    }}>Delete</Button>
+                    <tbody style={{ fontWeight: 500 }}>
+                        {allCars.map((car) => {
+                            return (
+                                <tr key={car.id}>
+                                    <td> {car.id} </td>
+                                    <td> {car.regNr} </td>
+                                    <td> {car.type}</td>
+                                    <td> {car.model}</td>
+                                    <td> {car.modelYear}</td>
+                                    <td> {car.dailySek}</td>
+                                    <td className='btns-td'>
 
-                                </td>
-                            </tr>
-                        )
-                    }
-                    )}
-                </tbody>
-            </Table>
+                                        <Button className="neutral-btn info-btn" id={car.id} variant="primary" onClick={viewCarDetails}>
+                                            <span className="not-clickable-part"><FontAwesomeIcon icon={faInfo} />
+                                            </span>
+                                        </Button>
+                                        {" "}
+
+                                        {/* // Prepare deletion of car: */}
+                                        <Button className="delete-btn" variant="danger" onClick={() => {
+                                            // setCarToDelete(car);
+                                            prepareDelete(car);
+                                        }}>Delete</Button>
+
+                                    </td>
+                                </tr>
+                            )
+                        }
+                        )}
+                    </tbody>
+
+
+                </Table>}
+
             <br></br>
             <div className="text-center">
                 {/* <Button variant="primary" onClick={addTrAccount}>New Account</Button>{" "} */}
                 {/* <Button variant="warning" onClick={goBack}>Back</Button> */}
             </div>
+
         </div>
     );
 }

@@ -52,7 +52,7 @@
 
 .main-navbar-outer {
   width: 100%;
-  background-color: rgb(229, 247, 173) !important;
+  background-color: rgb(190, 247, 173) !important;
   border-bottom: 2px solid;
   font-weight: 700;
 }
@@ -127,8 +127,36 @@
   padding: 0 !important;
 }
 
+/* SPINNER CSS */
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.load-spinner {
+  width: 40px;
+  height: 40px;
+  border: 5px solid rgb(190, 247, 173);
+  border-top: 5px solid #000000; 
+  border-radius: 50%;
+  animation: spinner 1.5s linear infinite;
+}
+.spin-div {
+  /* display: grid; */
+  margin-left: 50%;
+  margin-top: 10%;
+  justify-content: center;
+  align-items: center;
+  /* width: 25%;
+  height: 25%; */
+}
+
 .footer {
-  background-color: rgb(229, 247, 173) !important;
+  background-color: rgb(190, 247, 173) !important;
   position: fixed;
   bottom: 0;
   padding: 10px 10px 0px 10px;
