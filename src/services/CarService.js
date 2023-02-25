@@ -1,8 +1,8 @@
 import axios from "axios";
 
-class CarService {
+class CarService { // Class function
 
-    getAllCars(bearerTtoken) { // Class function
+    getAllCars(bearerTtoken) {
         const config = {
             headers: { Authorization: `Bearer ${bearerTtoken}` }
         };

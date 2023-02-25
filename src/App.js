@@ -35,8 +35,6 @@ function App() {
     onLoad: 'login-required',
   }
 
-  // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <div>
 
