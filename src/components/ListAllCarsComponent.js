@@ -176,7 +176,7 @@ function ListAllCarsComponent(props) {
         setOrdersToHandle([]); // Empty arrays before each delete-preparation
         SetCarsWithSameType([])
 
-        OrderService.getAllOrders().then((response) => {
+        OrderService.getAllOrders(keycloak.token).then((response) => {
 
             response.data.map((order) => {
                 let today = new Date(); // To filter out old orders
@@ -276,7 +276,7 @@ function ListAllCarsComponent(props) {
         }
 
         // // Delete, with selected car body
-        CarService.deleteCar(carToDelete).then(res => {
+        CarService.deleteCar(carToDelete, keycloak.token).then(res => {
             console.log("Deleted");
         });
 

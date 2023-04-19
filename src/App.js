@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HeaderComponent from './components/HeaderComponent';
 import FooterComponent from './components/FooterComponent';
 
@@ -25,7 +25,8 @@ function App() {
 
   // Keycloag configurations 
   const keycloak = new Keycloak({
-    url: "http://localhost:8080", // Auth not needed with Quarkus-keycloak
+    // url: "http://localhost:8080", // Auth not needed with Quarkus-keycloak
+    url: "http://192.168.0.153:8080", // When spring api container uses this
     realm: "car-rental-realm",
     clientId: "car-rental-v100",
     //  onLoad: 'login-required' 
@@ -42,7 +43,7 @@ function App() {
         authClient={keycloak}
         keycloak={keycloak}
         initOptions={keycloakProviderInitConfig}
-        // initOptions={{ onLoad: 'login-required' }}
+      // initOptions={{ onLoad: 'login-required' }}
       >
         <Router>
           <HeaderComponent />
