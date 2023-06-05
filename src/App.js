@@ -25,8 +25,8 @@ function App() {
 
   // Keycloag configurations 
   const keycloak = new Keycloak({
-    // url: "http://localhost:8080", // Auth not needed with Quarkus-keycloak
-    url: "http://192.168.0.153:8080", // When spring api container is using this
+    url: "http://localhost:8080", // Auth not needed with Quarkus-keycloak
+    // url: "http://192.168.0.153:8080", // When spring api container is using this
     realm: "car-rental-realm",
     clientId: "car-rental-v100",
     //  onLoad: 'login-required' 
