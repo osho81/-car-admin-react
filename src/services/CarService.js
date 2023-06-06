@@ -1,5 +1,7 @@
 import axios from "axios";
 
+// TODO: set base url here, for easier reuse in requests hereunder
+
 class CarService { // Class function
 
     getAllCars(bearerTtoken) {
