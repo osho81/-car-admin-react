@@ -16,7 +16,7 @@ function HeaderComponent(props) {
             {/* removed bg="light" and customized css instead */}
             <Navbar className="main-navbar-outer" expand="lg">
                 <Container className="main-navbar-inner">
-                    <Navbar.Brand href="#home">Car Rental</Navbar.Brand>
+                    <Navbar.Brand href="#home">Car Admin</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
