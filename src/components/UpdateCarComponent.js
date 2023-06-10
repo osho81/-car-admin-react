@@ -34,6 +34,7 @@ function UpdateCarComponent(props) {
     useEffect(() => { // Initial retrieval of customer details/values
 
         async function getCar() {
+            // Note: car-customer-react project uses getById instead of this approach
             CarService.getAllCars(keycloak.token).then((response) => {
                 response.data.map((c) => {
                     if (c.id === Number(id)) { // Find specific car
