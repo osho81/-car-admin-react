@@ -32,6 +32,7 @@ function AddCarComponent(props) {
 
         // Create object with field inputs, to send as request body
         // (Car id is automatically assigned in backend)
+        // Note: the properties corresponds exactly to backend car fields 
         let car = { regNr, model, type, modelYear, dailySek };
 
         // Send post request wih created object as body
