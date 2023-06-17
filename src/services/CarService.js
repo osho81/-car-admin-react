@@ -4,31 +4,31 @@ import axios from "axios";
 
 class CarService { // Class function
 
-    getAllCars(bearerTtoken) {
+    getAllCars(bearerToken) {
         const config = {
-            headers: { Authorization: `Bearer ${bearerTtoken}` }
+            headers: { Authorization: `Bearer ${bearerToken}` }
         };
         return axios.get("http://192.168.0.153:9090/api/v1/cars", config);
     }
 
-    createCar(car, bearerTtoken) {
+    createCar(car, bearerToken) {
         const config = {
-            headers: { Authorization: `Bearer ${bearerTtoken}` }
+            headers: { Authorization: `Bearer ${bearerToken}` }
         };
         return axios.post("http://localhost:9090/api/v1/addcar", car, config);
     }
 
-    updateCar(car, bearerTtoken) {
+    updateCar(car, bearerToken) {
         const config = {
-            headers: { Authorization: `Bearer ${bearerTtoken}` }
+            headers: { Authorization: `Bearer ${bearerToken}` }
         };
         return axios.put("http://localhost:9090/api/v1/updatecar", car, config);
     }
 
-    deleteCar(car, bearerTtoken) {
+    deleteCar(car, bearerToken) {
         const config = {
             data: car,
-            headers: { Authorization: `Bearer ${bearerTtoken}` }
+            headers: { Authorization: `Bearer ${bearerToken}` }
         };
         // Note: data payload is different for request body in delete methods
         return axios.delete("http://localhost:9090/api/v1/deletecar", config);
