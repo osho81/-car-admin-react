@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 import LoadingSpinnerComponent from './LoadingSpinnerComponent';
 
-// Keycloak imports (also see npm install of tehese)
+// Keycloak imports (also see npm install of these)
+import Keycloak from 'keycloak-js';
 import { useKeycloak } from '@react-keycloak/web'
 
 // Fontawsome for react; combine into an element before usage
